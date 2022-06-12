@@ -8,7 +8,7 @@ export class PersonResponseDto {
   name: string;
 
   @ApiProperty({ default: 180 })
-  heigth: number;
+  height: number;
 
   @ApiProperty({ default: 80 })
   mass: number;
@@ -16,7 +16,7 @@ export class PersonResponseDto {
   constructor({ id, name, height, mass }) {
     this.id = id;
     this.name = name;
-    this.heigth = height;
+    this.height = height;
     this.mass = mass;
   }
 }

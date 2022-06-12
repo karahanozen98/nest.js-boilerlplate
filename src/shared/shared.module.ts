@@ -1,15 +1,13 @@
-import { HttpModule } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
-
 import { ApiConfigService } from './services/api-config.service';
-import { HttpConfigService } from './services/http-config.service';
-import { HttpRequestService } from './services/http-request.service';
-const providers = [ApiConfigService, HttpConfigService, HttpRequestService];
+import { SessionCacheService } from './services/session-cache.service';
+import { WebClientService } from './services/web-client.service';
+
+const providers = [ApiConfigService, WebClientService, SessionCacheService];
 
 @Global()
 @Module({
   providers,
-  imports: [HttpModule.registerAsync({ useExisting: HttpConfigService })],
   exports: [...providers],
 })
 export class SharedModule {}

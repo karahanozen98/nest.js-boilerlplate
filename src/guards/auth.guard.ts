@@ -1,20 +1,31 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { ALLOW_ANON_KEY } from '../constants';
 import { Observable } from 'rxjs';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  constructor(private readonly reflector: Reflector) {}
+  canActivate(ctx: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     try {
-      // const request = context.switchToHttp().getRequest();
-      // const response = context.switchToHttp().getResponse();
-      return validateRequest();
+      const allowAnonymous =
+        this.reflector.get<boolean>(ALLOW_ANON_KEY, ctx.getHandler()) ||
+        this.reflector.get<boolean>(ALLOW_ANON_KEY, ctx.getClass());
+      if (allowAnonymous) {
+        return true;
+      }
+
+      const token = ctx.switchToHttp().getRequest().cookies['jwtToken'];
+      if (!token) return false;
+      return validateRequest(token);
     } catch (error) {
+      console.log(error);
       return false;
     }
   }
 }
 
-// handles authorization guard
-function validateRequest() {
-  return true;
+// do authorization logic
+function validateRequest(token: string) {
+  return !!token;
 }

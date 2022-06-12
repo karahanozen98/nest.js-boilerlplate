@@ -1,13 +1,23 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Type } from '@nestjs/common';
-import { ApiBody, ApiOkResponse, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Observable } from 'rxjs';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
+import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { AllowAnonymous, CacheAdd, CacheClear } from 'decorators';
+import { I18n, I18nContext } from 'nestjs-i18n';
 import { ApiConfigService } from 'shared/services/api-config.service';
-import { CreateSampleDto } from './dto/request/create-sample-request.dto';
-import { PersonResponseDto } from './dto/response/person-response.dto';
+import { CreateSampleDto } from './dto/request/createSampleRequestDto';
+import { PersonResponseDto } from './dto/response/personResponseDto';
 import { SampleService } from './sample.service';
 
 @ApiTags('sample')
-@Controller('sample')
+@Controller({ path: '/sample', version: '1' })
 export class SampleController {
   constructor(
     private readonly sampleService: SampleService,
@@ -17,15 +27,18 @@ export class SampleController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'List of users', type: [PersonResponseDto] })
-  list(): Promise<Observable<PersonResponseDto>> {
-    return this.sampleService.list();
+  @CacheAdd()
+  @AllowAnonymous()
+  async list(): Promise<PersonResponseDto> {
+    return await this.sampleService.list();
   }
 
   @Get('/person/:id')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'id', format: 'string' })
   @ApiOkResponse({ description: 'Find Person by id', type: PersonResponseDto })
-  async getPerson(@Param('id') id: string): Promise<Observable<PersonResponseDto>> {
+  @CacheAdd()
+  async getPerson(@Param('id') id: string): Promise<PersonResponseDto> {
     return await this.sampleService.get(id);
   }
 
@@ -39,7 +52,16 @@ export class SampleController {
   @Post('create')
   @HttpCode(HttpStatus.CREATED)
   @ApiBody({ type: CreateSampleDto })
-  create(@Body() createSampleDto: CreateSampleDto): string {
-    return this.sampleService.create(createSampleDto);
+  @ApiCreatedResponse()
+  @CacheClear()
+  create(@Body() createSampleDto: CreateSampleDto) {
+    this.sampleService.create(createSampleDto);
+  }
+
+  @Get('translate')
+  @HttpCode(HttpStatus.OK)
+  async translate(@I18n() i18n: I18nContext) {
+    throw new NotFoundException('sample.user.notFound');
+    return await i18n.t('sample.name');
   }
 }

@@ -1,0 +1,7 @@
+{
+    "day": "Day",
+    "name": "Name",
+    "user": {
+        "notFound": "Sample user not found"
+    }
+}

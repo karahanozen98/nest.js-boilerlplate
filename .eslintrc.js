@@ -20,9 +20,20 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@moneteam/nestjs/recommended',
   ],
-  plugins: ['@typescript-eslint', 'prettier', 'simple-import-sort', 'import', 'unicorn', 'sonarjs', '@moneteam/nestjs'],
+  plugins: [
+    '@typescript-eslint',
+    'prettier',
+    'simple-import-sort',
+    'import',
+    'unicorn',
+    'sonarjs',
+    '@moneteam/nestjs',
+  ],
   rules: {
-    'prettier/prettier': ['error', { singleQuote: true, trailingComma: 'all', tabWidth: 2, bracketSpacing: true }],
+    'prettier/prettier': [
+      'error',
+      { singleQuote: true, trailingComma: 'all', tabWidth: 2, bracketSpacing: true },
+    ],
     /**
      * plugin:import
      */
@@ -93,7 +104,8 @@ module.exports = {
             message: 'Avoid using the `Object` type. Did you mean `object`?',
           },
           Function: {
-            message: 'Avoid using the `Function` type. Prefer a specific function type, like `() => void`.',
+            message:
+              'Avoid using the `Function` type. Prefer a specific function type, like `() => void`.',
           },
           Boolean: {
             message: 'Avoid using the `Boolean` type. Did you mean `boolean`?',

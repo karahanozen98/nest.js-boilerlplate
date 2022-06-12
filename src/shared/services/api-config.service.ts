@@ -22,6 +22,10 @@ export class ApiConfigService {
     return this.nodeEnv === ENVIRONMENT.test;
   }
 
+  get fallbackLanguage(): string {
+    return this.getString('FALLBACK_LANG');
+  }
+
   private getNumber(key: string): number {
     const value = this.get(key);
 

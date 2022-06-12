@@ -1,40 +1,20 @@
-import { HttpService } from '@nestjs/axios';
 import { HttpException, Injectable } from '@nestjs/common';
-import { catchError, lastValueFrom, map, Observable } from 'rxjs';
-import { HttpRequestService } from 'shared/services/http-request.service';
-import { CreateSampleDto } from './dto/request/create-sample-request.dto';
-import { PersonResponseDto } from './dto/response/person-response.dto';
+import { WebClientService } from 'shared/services/web-client.service';
+import { CreateSampleDto } from './dto/request/createSampleRequestDto';
+import { PersonResponseDto } from './dto/response/personResponseDto';
 
 @Injectable()
 export class SampleService {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly httpRequestService: HttpRequestService,
-  ) {}
+  constructor(private readonly webClientService: WebClientService) {}
 
-  async list(): Promise<Observable<any>> {
-    // Default HttpServer example:
-    const list = this.httpService.get('people/').pipe(
-      map((res) => res.data),
-      catchError((err) => {
-        throw new HttpException(err.response.data, 400);
-      }),
-    );
-
-    return list;
+  async list(): Promise<any> {
+    const { data } = await this.webClientService.get('people');
+    return data;
   }
 
-  async get(id: string): Promise<Observable<PersonResponseDto>> {
-    // Promises example:
-    const person1 = await lastValueFrom(this.httpRequestService.get(`people/${id}`));
-    console.log(person1.data);
-
-    //Custom HttpServer example
-    const response = this.httpRequestService
-      .get(`people/${id}`)
-      .pipe(map((res) => new PersonResponseDto({ id, ...res.data })));
-
-    return response;
+  async get(id: string): Promise<PersonResponseDto> {
+    const { data } = await this.webClientService.get(`people/${id}`);
+    return new PersonResponseDto(data);
   }
 
   create(createSampleDto: CreateSampleDto): string {
