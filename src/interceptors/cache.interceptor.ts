@@ -1,34 +1,33 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { CacheOptions, ExpirationType } from 'common/cache';
+import { CallHandler, ExecutionContext, Injectable } from '@nestjs/common';
+import { CacheOptions, ExpirationType } from 'common/cache/interface';
+import { AbstractCacheInterceptor } from 'abstraction';
 import { of, Observable, tap } from 'rxjs';
-import { sessionCache } from 'helpers/cache';
 
 @Injectable()
-export class UseCacheInterceptor implements NestInterceptor {
-  private options: CacheOptions | undefined;
+export class UseCacheInterceptor extends AbstractCacheInterceptor {
   constructor(opt?: CacheOptions) {
-    this.options = opt;
+    super(opt);
   }
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest();
-    context.switchToRpc().getContext();
+  async intercept(ctx: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+    const request = ctx.switchToHttp().getRequest();
+    ctx.switchToRpc().getContext();
 
     if (!request.cookies.sessionId) {
       return next.handle();
     }
 
-    const key = this.options?.key
-      ? `sessionId:${request.cookies.sessionId}-${this.options.key}`
-      : `sessionId:${request.cookies.sessionId}-${context.getClass().name}-${
-          context.getHandler().name
-        }`;
+    const key = this.generateKey(
+      request.cookies.sessionId,
+      ctx.getClass().name,
+      ctx.getHandler().name,
+    );
 
     // find key in cache and send with response
-    const data = await sessionCache.get(key);
+    const data = await this.cache.get(key);
     if (data && data._originalUrl === request.originalUrl) {
       if (this.options?.expiration !== ExpirationType.absolute) {
-        sessionCache.set(key, { ...data, _originalUrl: request.originalUrl }); // update expire date
+        this.cache.set(key, { ...data, _originalUrl: request.originalUrl }); // update expire date
       }
       delete data._originalUrl;
       return of(data);
@@ -42,35 +41,25 @@ export class UseCacheInterceptor implements NestInterceptor {
     // add data to cache
     return next.handle().pipe(
       tap(async (data) => {
-        await sessionCache.set(key, { ...data, _originalUrl: request.originalUrl });
+        this.cache.set(key, { ...data, _originalUrl: request.originalUrl });
       }),
     );
   }
 }
 
-export class ClearCacheInterceptor implements NestInterceptor {
-  private options: CacheOptions | undefined;
+export class ClearCacheInterceptor extends AbstractCacheInterceptor {
   constructor(opt?: CacheOptions) {
-    this.options = opt;
+    super(opt);
   }
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest();
+  async intercept(ctx: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+    const request = ctx.switchToHttp().getRequest();
     if (!request.cookies.sessionId) {
       return next.handle();
     }
 
-    if (this.options?.key) {
-      // delete item by key
-      sessionCache.del(`sessionId:${request.cookies.sessionId}-${this.options.key}`);
-    } else {
-      // delete all items related to current controller
-      const allKeys = await sessionCache.keys(
-        `sessionId:${request.cookies.sessionId}-${context.getClass().name}*`,
-      );
-      sessionCache.del(allKeys);
-    }
-
+    const keys = await this.resolveKey(request.cookies.sessionId, ctx.getClass().name);
+    this.cache.del(keys);
     return next.handle();
   }
 }

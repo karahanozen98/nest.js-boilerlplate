@@ -2,6 +2,7 @@
     "day": "Day",
     "name": "Name",
     "user": {
+        "found": "Congrats user is found",
         "notFound": "Sample user not found"
     }
 }

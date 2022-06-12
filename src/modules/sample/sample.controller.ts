@@ -1,22 +1,20 @@
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  NotFoundException,
-  Param,
-  Post,
-} from '@nestjs/common';
-import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AllowAnonymous, CacheAdd, CacheClear } from 'decorators';
-import { I18n, I18nContext } from 'nestjs-i18n';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { CreateSampleDto } from './dto/request/createSampleRequestDto';
 import { PersonResponseDto } from './dto/response/personResponseDto';
 import { SampleService } from './sample.service';
 
-@ApiTags('sample')
+@ApiTags('Sample')
 @Controller({ path: '/sample', version: '1' })
 export class SampleController {
   constructor(
@@ -27,7 +25,8 @@ export class SampleController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'List of users', type: [PersonResponseDto] })
-  @CacheAdd()
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @CacheAdd({ public: true })
   @AllowAnonymous()
   async list(): Promise<PersonResponseDto> {
     return await this.sampleService.list();
@@ -60,8 +59,8 @@ export class SampleController {
 
   @Get('translate')
   @HttpCode(HttpStatus.OK)
-  async translate(@I18n() i18n: I18nContext) {
-    throw new NotFoundException('sample.user.notFound');
-    return await i18n.t('sample.name');
+  @ApiResponse({ type: 'any' })
+  async translate() {
+    return this.sampleService.translate();
   }
 }

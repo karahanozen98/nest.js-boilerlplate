@@ -1,4 +1,4 @@
-import { HttpStatus, UnprocessableEntityException, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
 
 export class GlobalValidationPipe extends ValidationPipe {
   constructor() {

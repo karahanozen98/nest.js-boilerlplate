@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { sessionCache } from 'helpers/cache';
+import { sessionCache } from 'common/cache';
 
 @Injectable()
 export class SessionCacheService {
