@@ -5,7 +5,7 @@ const defaultTTL = 900; // 15 mins
 class Cache implements ICache {
   private client: any;
 
-  constructor(options?: RedisClientOptions) {
+  createClient(options?: RedisClientOptions) {
     this.client = createClient(options);
     this.client.on('error', (error: Error) => {
       console.log('Redis client error: ', error);
