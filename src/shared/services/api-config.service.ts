@@ -58,6 +58,8 @@ export class ApiConfigService {
     return {
       port: this.getNumber('PORT'),
       baseUrl: this.getString('BACKEND_URL'),
+      publicCacheUrl: this.getString('PUBLIC_CACHE'),
+      sessionCacheUrl: this.getString('SESSION_CACHE'),
     };
   }
 

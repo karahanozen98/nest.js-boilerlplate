@@ -1,9 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { publicCache } from "common/cache";
+import { Injectable } from '@nestjs/common';
+import { publicCache } from 'common/cache';
+import { ApiConfigService } from './api-config.service';
 
 @Injectable()
 export class PublicCacheService {
-  constructor() {}
+  constructor(apiConfigService: ApiConfigService) {
+    publicCache.createClient({ url: apiConfigService.apiConfig.publicCacheUrl });
+  }
 
   async get(key: string) {
     return await publicCache.get(key);
