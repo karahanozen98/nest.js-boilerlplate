@@ -44,7 +44,7 @@ class Cache implements ICache {
   async set(key: string, value: string | object): Promise<void> {
     try {
       let data = typeof value === 'object' ? JSON.stringify({ ...value }) : value;
-      await this.client.SET(key, data, { EX: defaultTTL });
+      await this.client.set(key, data, { EX: defaultTTL });
     } catch (error) {
       console.error(error);
     }
