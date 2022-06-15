@@ -1,0 +1,45 @@
+version: '3.2'
+services:
+  sessionCache:
+    image: redis:6.2-alpine
+    container_name: sessionCache
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+  publicCache:
+    image: redis:6.2-alpine
+    container_name: publicCache
+    restart: always
+    ports:
+      - '6380:6380'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+  nest-project:
+    build:
+      context: .
+      dockerfile: 'Dockerfile'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - sessionCache
+      - publicCache
+    environment:
+      NODE_ENV: development
+      BACKEND_URL: https://swapi.dev/api/
+      ENABLE_DOCUMENTATION: false
+      PORT: 3000
+      FALLBACK_LANG: en-us
+      PUBLIC_CACHE: redis://publicCache
+      SESSION_CACHE: redis://sessionCache
+    links:
+      - publicCache
+      - sessionCache
+    volumes:
+      - ./:/src
+volumes:
+  cache:
+    driver: local

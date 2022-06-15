@@ -1,16 +1,26 @@
-import { createClient, RedisClientOptions } from 'redis';
+import { Logger } from '@nestjs/common';
+import { createClient } from 'redis';
 import { ICache } from './interface';
 const defaultTTL = 900; // 15 mins
 
 class Cache implements ICache {
   private client: any;
 
-  createClient(options?: RedisClientOptions) {
+  createClient(options?: any): ICache {
     this.client = createClient(options);
+
     this.client.on('error', (error: Error) => {
-      console.log('Redis client error: ', error);
+      Logger.error('Redis client error: ', error);
     });
-    this.client.connect();
+    this.client.on('connect', () => {
+      Logger.verbose('Redis connection established');
+    });
+
+    (async () => {
+      await this.client.connect();
+    })();
+
+    return this.client;
   }
 
   async get(key: string): Promise<any> {

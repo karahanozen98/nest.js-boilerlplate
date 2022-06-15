@@ -13,7 +13,7 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
     const request = ctx.switchToHttp().getRequest();
     ctx.switchToRpc().getContext();
 
-    if (!request.cookies.sessionId) {
+    if (!this.options?.public && !request.cookies.sessionId) {
       return next.handle();
     }
 

@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import createRedisStore from 'connect-redis';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from 'helpers';
@@ -11,8 +12,10 @@ import { SharedModule } from 'shared/shared.module';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { UnprocessableEntityExceptionFilter } from 'filters';
 import { GlobalValidationPipe } from 'pipes/global-validation-pipe';
-import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import { AuthGuard } from 'guards/auth.guard';
+import { sessionCache } from 'common/cache';
+import { SessionCacheService } from 'shared/services/session-cache.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(), {
@@ -21,6 +24,8 @@ async function bootstrap() {
 
   const reflector = app.get(Reflector);
   const configService = app.select(SharedModule).get(ApiConfigService);
+  const sessionCacheService = app.select(SharedModule).get(SessionCacheService);
+  const RedisStore = createRedisStore(session);
 
   app.enableVersioning();
   app.use(cookieParser());
@@ -29,16 +34,22 @@ async function bootstrap() {
   app.use(morgan('combined'));
   app.use(
     session({
+      name: 'sessionID',
       secret: 'keyboard cat',
       resave: false,
       saveUninitialized: false,
-      //store: new RedisStore(), //default is memory storage which is not useful in production
+      cookie: { httpOnly: true, secure: configService.isProduction, maxAge: 1000 * 60 * 60 * 8 },
+      store: new RedisStore({
+        client: sessionCacheService.getClient(),
+      }),
     }),
   );
+
   app.useGlobalFilters(new UnprocessableEntityExceptionFilter());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
   app.useGlobalPipes(new GlobalValidationPipe());
   app.useGlobalGuards(new AuthGuard(reflector));
+
   if (configService.documentationEnabled) {
     setupSwagger(app);
   }
@@ -48,7 +59,7 @@ async function bootstrap() {
   }
 
   await app.listen(configService.apiConfig.port);
-  console.info(`Application running on ${await app.getUrl()}`);
+  Logger.log(`Application running on ${await app.getUrl()}`);
   return app;
 }
 bootstrap();

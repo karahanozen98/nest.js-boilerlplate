@@ -1,8 +1,9 @@
-import { Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, Session } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger/dist';
 import { AllowAnonymous } from 'decorators';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/request/loginDto';
 
 @AllowAnonymous()
 @ApiTags('Authorization')
@@ -12,11 +13,18 @@ export class AuthController {
 
   @Post('login')
   @AllowAnonymous()
-  async login(@Res({ passthrough: true }) response: Response) {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Session() session: Record<string, any>,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    this.authService.login();
     const expires = new Date();
+    expires.setHours(expires.getHours() + 8);
+    response.cookie('sessionID', `${loginDto.username}`, { httpOnly: true, expires });
     expires.setDate(expires.getDate() + 2);
-
-    response.cookie('jwtToken', 'token', { httpOnly: true, expires });
-    return this.authService.login();
+    session.username = loginDto.username;
+    session.lastLoginDate = new Date().toISOString();
+    return;
   }
 }
