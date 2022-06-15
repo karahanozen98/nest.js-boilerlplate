@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import RedisClient from '@redis/client/dist/lib/client';
 import { sessionCache } from 'common/cache';
-import { RedisFunctions, RedisModules, RedisScripts } from 'redis';
+import { ICache } from 'common/cache/interface';
 import { ApiConfigService } from './api-config.service';
 
 @Injectable()
 export class SessionCacheService {
-  client: any;
+  client: ICache;
   constructor(apiConfigService: ApiConfigService) {
     this.client = sessionCache.createClient({
       url: apiConfigService.apiConfig.sessionCacheUrl,

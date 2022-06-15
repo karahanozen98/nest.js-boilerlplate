@@ -13,7 +13,7 @@ class Cache implements ICache {
       Logger.error('Redis client error: ', error);
     });
     this.client.on('connect', () => {
-      Logger.verbose('Redis connection established');
+      Logger.log('Redis connection established');
     });
 
     (async () => {
