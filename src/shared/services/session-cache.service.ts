@@ -9,7 +9,6 @@ export class SessionCacheService {
   constructor(apiConfigService: ApiConfigService) {
     this.client = sessionCache.createClient({
       url: apiConfigService.apiConfig.sessionCacheUrl,
-      legacyMode: true,
     });
   }
 

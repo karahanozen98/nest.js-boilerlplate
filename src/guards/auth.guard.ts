@@ -15,9 +15,9 @@ export class AuthGuard implements CanActivate {
         return true;
       }
 
-      const token = ctx.switchToHttp().getRequest().cookies['jwtToken'];
-      if (!token) return false;
-      return validateRequest(token);
+      const session = ctx.switchToHttp().getRequest().session;
+      if (!session) return false;
+      return validateRequest(session.user);
     } catch (error) {
       console.log(error);
       return false;
@@ -26,6 +26,6 @@ export class AuthGuard implements CanActivate {
 }
 
 // do authorization logic
-function validateRequest(token: string) {
-  return !!token;
+function validateRequest(user: any) {
+  return !!user;
 }

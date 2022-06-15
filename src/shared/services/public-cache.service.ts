@@ -9,7 +9,6 @@ export class PublicCacheService {
   constructor(apiConfigService: ApiConfigService) {
     this.client = publicCache.createClient({
       url: apiConfigService.apiConfig.publicCacheUrl,
-      legacyMode: true,
     });
   }
 

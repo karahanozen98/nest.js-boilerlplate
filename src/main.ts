@@ -4,6 +4,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import createRedisStore from 'connect-redis';
+import { createClient } from 'redis';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from 'helpers';
@@ -14,8 +15,6 @@ import { UnprocessableEntityExceptionFilter } from 'filters';
 import { GlobalValidationPipe } from 'pipes/global-validation-pipe';
 import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import { AuthGuard } from 'guards/auth.guard';
-import { sessionCache } from 'common/cache';
-import { SessionCacheService } from 'shared/services/session-cache.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(), {
@@ -24,8 +23,16 @@ async function bootstrap() {
 
   const reflector = app.get(Reflector);
   const configService = app.select(SharedModule).get(ApiConfigService);
-  const sessionCacheService = app.select(SharedModule).get(SessionCacheService);
+
   const RedisStore = createRedisStore(session);
+  const redisClient = createClient({
+    url: configService.apiConfig.sessionCacheUrl,
+    legacyMode: true, // RedisStore currently not working with redis version 4.0 or above
+  });
+  redisClient.on('error', (error) => Logger.error('Redis connection error', error));
+  await redisClient.connect();
+
+ 
 
   app.enableVersioning();
   app.use(cookieParser());
@@ -34,13 +41,13 @@ async function bootstrap() {
   app.use(morgan('combined'));
   app.use(
     session({
-      name: 'sessionID',
+      name: 'sessionId',
       secret: 'keyboard cat',
       resave: false,
       saveUninitialized: false,
       cookie: { httpOnly: true, secure: configService.isProduction, maxAge: 1000 * 60 * 60 * 8 },
       store: new RedisStore({
-        client: sessionCacheService.getClient(),
+        client: redisClient,
       }),
     }),
   );

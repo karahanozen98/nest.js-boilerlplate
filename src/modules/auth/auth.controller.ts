@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Session } from '@nestjs/common';
+import { Body, Controller, Post, Res, Session, UnauthorizedException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger/dist';
 import { AllowAnonymous } from 'decorators';
 import { Response } from 'express';
@@ -18,13 +18,18 @@ export class AuthController {
     @Session() session: Record<string, any>,
     @Res({ passthrough: true }) response: Response,
   ) {
-    this.authService.login();
+    const user = await this.authService.login(loginDto);
+    if (!user) {
+      response.clearCookie('sessionId');
+      throw new UnauthorizedException();
+    }
     const expires = new Date();
     expires.setHours(expires.getHours() + 8);
-    response.cookie('sessionID', `${loginDto.username}`, { httpOnly: true, expires });
-    expires.setDate(expires.getDate() + 2);
-    session.username = loginDto.username;
-    session.lastLoginDate = new Date().toISOString();
-    return;
+
+    session.user = {
+      username: loginDto.username,
+      lastLoginDate: new Date().toISOString(),
+    };
+    return session.user;
   }
 }

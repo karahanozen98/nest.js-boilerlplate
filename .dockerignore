@@ -5,3 +5,4 @@ db-data
 .vuepress
 .vscode
 docs
+tsconfig.build.tsbuildinfo
