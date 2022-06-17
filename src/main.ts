@@ -13,7 +13,7 @@ import { SharedModule } from 'shared/shared.module';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { UnprocessableEntityExceptionFilter } from 'filters';
 import { GlobalValidationPipe } from 'pipes/global-validation-pipe';
-import { ClassSerializerInterceptor, Logger, RequestMethod } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import { AuthGuard } from 'guards/auth.guard';
 import { join } from 'path';
 import { globalPrefixExcludeList } from 'constant';

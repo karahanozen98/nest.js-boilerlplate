@@ -1,6 +1,18 @@
+import { applyDecorators } from '@nestjs/common';
 import type { ApiPropertyOptions } from '@nestjs/swagger';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type as ClassTransformerType } from 'class-transformer';
+import { IsArray, IsBoolean, IsNumber, IsString, ValidateNested } from 'class-validator';
+import { ApiArrayPropertyParams } from 'interface';
 import { getVariableName } from '../common/utils/get-variable-name';
+
+export function ApiStringProperty(): PropertyDecorator {
+  return applyDecorators(ApiProperty({ type: String }), IsString());
+}
+
+export function ApiNumberProperty(): PropertyDecorator {
+  return applyDecorators(ApiProperty({ type: Number }), IsNumber());
+}
 
 export function ApiBooleanProperty(
   options: Omit<ApiPropertyOptions, 'type'> = {},
@@ -56,4 +68,34 @@ export function ApiEnumPropertyOptional<TEnum>(
   } = {},
 ): PropertyDecorator {
   return ApiEnumProperty(getEnum, { required: false, ...options });
+}
+
+export function ApiClassProperty(options: { type: Function }) {
+  const { type } = options;
+  return applyDecorators(
+    ApiProperty({ type }),
+    ValidateNested(),
+    ClassTransformerType(() => type),
+  );
+}
+
+export function ApiArrayProperty(options?: ApiArrayPropertyParams): PropertyDecorator {
+  const { type, each } = options || { type: undefined, each: true };
+  const decorators = [ApiProperty({ type: type }), IsArray()];
+
+  if (!type) {
+    return applyDecorators(...decorators);
+  } else if (type === Number) {
+    decorators.push(IsNumber({}, { each }));
+  } else if (type === String) {
+    decorators.push(IsString({ each }));
+  } else if (type === Boolean) {
+    decorators.push(IsBoolean({ each }));
+  } else {
+    decorators.push(
+      ValidateNested({ each }),
+      ClassTransformerType(() => type),
+    );
+  }
+  return applyDecorators(...decorators);
 }

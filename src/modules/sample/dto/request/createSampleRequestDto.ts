@@ -1,15 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsArray, IsString, ValidateNested } from 'class-validator';
-import { IsPassword, IsUndefinable } from 'decorators/';
+import {
+  IsPassword,
+  IsUndefinable,
+  ApiStringProperty,
+  ApiNumberProperty,
+  ApiArrayProperty,
+  ApiClassProperty,
+} from 'decorators/';
 
 class Planet {
-  @ApiProperty()
-  @IsString()
-  id: string;
+  @ApiNumberProperty()
+  id: number;
 
-  @ApiProperty()
-  @IsString()
+  @ApiStringProperty()
   name: string;
 }
 
@@ -18,21 +21,19 @@ export class CreateSampleDto {
   @IsUndefinable()
   id: string;
 
-  @ApiProperty()
-  @IsString()
+  @ApiStringProperty()
   name: string;
 
-  @ApiProperty()
-  @IsString()
+  @ApiStringProperty()
   description: string;
 
   @ApiProperty()
   @IsPassword()
   password: string;
 
-  @ApiProperty({ type: [Planet] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Planet)
-  planets: [Planet];
+  @ApiClassProperty({ type: Planet })
+  mainPlanet: Planet;
+
+  @ApiArrayProperty({ type: Planet })
+  planets: Planet[];
 }
