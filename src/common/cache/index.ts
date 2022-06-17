@@ -19,8 +19,7 @@ class Cache implements ICache {
     (async () => {
       await this.client.connect();
     })();
-
-    return this.client;
+    return this;
   }
 
   async get(key: string): Promise<any> {
