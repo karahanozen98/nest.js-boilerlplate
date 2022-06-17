@@ -15,23 +15,15 @@ export class AuthController {
 
   @Post('login')
   @AllowAnonymous()
-  async login(
-    @Body() loginDto: LoginDto,
-    @Session() session: Record<string, any>,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
     const user = await this.authService.login(loginDto);
-    if (!user) {
-      response.clearCookie('sessionId');
-      throw new UnauthorizedException();
-    }
-    const expires = new Date();
-    expires.setHours(expires.getHours() + 8);
+    return user;
+  }
 
-    session.user = {
-      username: loginDto.username,
-      lastLoginDate: new Date().toISOString(),
-    };
-    return session.user;
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    await this.authService.logout();
+    response.clearCookie('sessionId');
+    return;
   }
 }

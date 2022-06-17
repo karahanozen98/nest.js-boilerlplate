@@ -27,4 +27,9 @@ export class SessionCacheService {
   async delAsync(key: string | string[]) {
     await this.client.del(key);
   }
+
+  async findAndDeleteAsync(pattern: string) {
+    const keys = await this.client.keys(pattern);
+    await this.delAsync(keys);
+  }
 }
