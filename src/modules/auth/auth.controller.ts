@@ -4,10 +4,12 @@ import { AllowAnonymous } from 'decorators';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/loginDto';
+import { Throttle } from '@nestjs/throttler';
 
 @AllowAnonymous()
 @ApiTags('Authorization')
 @Controller({ path: '/auth', version: '1' })
+@Throttle(5, 60)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

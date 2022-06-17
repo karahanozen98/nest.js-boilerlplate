@@ -11,17 +11,14 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
 
   async intercept(ctx: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const request = ctx.switchToHttp().getRequest();
+    const session = request.session;
     ctx.switchToRpc().getContext();
 
-    if (!this.options?.public && !request.cookies.sessionId) {
+    if (!this.options?.public && !session.user) {
       return next.handle();
     }
 
-    const key = this.generateKey(
-      request.cookies.sessionId,
-      ctx.getClass().name,
-      ctx.getHandler().name,
-    );
+    const key = this.generateKey(session.id, ctx.getClass().name, ctx.getHandler().name);
 
     // find key in cache and send with response
     const data = await this.cache.get(key);

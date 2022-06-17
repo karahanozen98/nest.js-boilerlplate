@@ -3,3 +3,4 @@ export * from './order';
 export * from '../common/dto/page-dto';
 export * from './language-code';
 export * from './variables';
+export * from './global-prefix-exclude-list';

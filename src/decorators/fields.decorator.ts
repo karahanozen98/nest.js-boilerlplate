@@ -26,7 +26,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-import { supportedLanguageCount } from '../constants';
+import { supportedLanguageCount } from '../constant';
 import { ApiEnumProperty, ApiUUIDProperty } from './property.decorator';
 import {
   PhoneNumberSerializer,

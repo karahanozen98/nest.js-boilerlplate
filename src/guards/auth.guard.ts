@@ -1,5 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { ALLOW_ANON_KEY } from '../constants';
+import { ALLOW_ANON_KEY } from '../constant';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 

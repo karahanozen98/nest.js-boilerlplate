@@ -8,16 +8,18 @@ import { createClient } from 'redis';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from 'helpers';
-import { ExpressAdapter } from '@nestjs/platform-express';
+import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
 import { SharedModule } from 'shared/shared.module';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { UnprocessableEntityExceptionFilter } from 'filters';
 import { GlobalValidationPipe } from 'pipes/global-validation-pipe';
-import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, RequestMethod } from '@nestjs/common';
 import { AuthGuard } from 'guards/auth.guard';
+import { join } from 'path';
+import { globalPrefixExcludeList } from 'constant';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(), {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {
     cors: true,
   });
 
@@ -31,8 +33,6 @@ async function bootstrap() {
   });
   redisClient.on('error', (error) => Logger.error('Redis connection error', error));
   await redisClient.connect();
-
- 
 
   app.enableVersioning();
   app.use(cookieParser());
@@ -56,6 +56,12 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
   app.useGlobalPipes(new GlobalValidationPipe());
   app.useGlobalGuards(new AuthGuard(reflector));
+
+  app.setGlobalPrefix('api', { exclude: globalPrefixExcludeList });
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('ejs');
 
   if (configService.documentationEnabled) {
     setupSwagger(app);

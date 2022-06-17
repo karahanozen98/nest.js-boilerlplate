@@ -6,9 +6,9 @@ import { SharedModule } from 'shared/shared.module';
 import { AppController } from './app.controller';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { ApiConfigService } from 'shared/services/api-config.service';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from 'filters';
-
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 @Module({
   controllers: [AppController],
   imports: [
@@ -28,6 +28,10 @@ import { HttpExceptionFilter } from 'filters';
         },
       }),
     }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     SharedModule,
     ModuleContainerModule,
   ],
@@ -35,6 +39,10 @@ import { HttpExceptionFilter } from 'filters';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
