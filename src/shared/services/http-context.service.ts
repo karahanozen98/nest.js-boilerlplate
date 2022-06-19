@@ -2,7 +2,6 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { RequestSession, SessionUser } from 'interface/session.interface';
-import { promisify } from 'util';
 import { SessionCacheService } from './session-cache.service';
 
 @Injectable({ scope: Scope.REQUEST })
