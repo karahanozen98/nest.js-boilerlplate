@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { publicCache } from 'common/cache';
-import { ICache } from 'common/cache/interface';
+import type { ICache } from 'common/cache/interface';
+
 import { ApiConfigService } from './api-config.service';
 
 @Injectable()
 export class PublicCacheService {
   private client: ICache;
+
   constructor(apiConfigService: ApiConfigService) {
     this.client = publicCache.createClient({
       url: apiConfigService.apiConfig.publicCacheUrl,
@@ -16,7 +18,7 @@ export class PublicCacheService {
     return await this.client.get(key);
   }
 
-  async setAsync(key: string, value: object) {
+  async setAsync(key: string, value: string | Record<string, any>) {
     await this.client.set(key, value);
   }
 

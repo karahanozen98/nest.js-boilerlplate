@@ -1,12 +1,14 @@
-import axios from 'axios';
 import { HttpException, Injectable } from '@nestjs/common';
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { ApiConfigService } from './api-config.service';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 import { AxiosNoResponseException, AxiosRequestFailedException } from 'exceptions';
+
+import { ApiConfigService } from './api-config.service';
 
 @Injectable()
 export class WebClientService {
   httpService: AxiosInstance;
+
   constructor(private readonly apiConfigService: ApiConfigService) {
     this.httpService = axios.create({
       baseURL: this.apiConfigService.apiConfig.baseUrl,
@@ -17,44 +19,46 @@ export class WebClientService {
     });
 
     this.httpService.interceptors.response.use(
-      (value) => {
-        return value;
-      },
+      (value) => value,
       (error) => {
-        if (error.response) throw new HttpException(error.message, error.response?.status);
-        else if (error.request) throw new AxiosNoResponseException();
-        else throw new AxiosRequestFailedException();
+        if (error.response) {
+          throw new HttpException(error.message as string, error.response?.status as number);
+        } else if (error.request) {
+          throw new AxiosNoResponseException();
+        } else {
+          throw new AxiosRequestFailedException();
+        }
       },
     );
   }
 
-  async get(
+  async get<T = any, D = any>(
     url: string,
-    config: AxiosRequestConfig<any> | undefined = undefined,
-  ): Promise<AxiosResponse<any, any>> {
+    config?: AxiosRequestConfig<any> | undefined,
+  ): Promise<AxiosResponse<T, D>> {
     return await this.httpService.get(url, config);
   }
 
-  async post(
+  async post<T = any, D = any>(
     url: string,
     data: any,
-    config: AxiosRequestConfig<any> | undefined = undefined,
-  ): Promise<AxiosResponse<any, any>> {
+    config?: AxiosRequestConfig<any> | undefined,
+  ): Promise<AxiosResponse<T, D>> {
     return await this.httpService.post(url, data, config);
   }
 
-  async put(
+  async put<T = any, D = any>(
     url: string,
     data: any,
-    config: AxiosRequestConfig<any> | undefined = undefined,
-  ): Promise<AxiosResponse<any, any>> {
+    config?: AxiosRequestConfig<any> | undefined,
+  ): Promise<AxiosResponse<T, D>> {
     return await this.httpService.put(url, data, config);
   }
 
-  async delete(
+  async delete<T = any, D = any>(
     url: string,
-    config: AxiosRequestConfig<any> | undefined = undefined,
-  ): Promise<AxiosResponse<any, any>> {
+    config?: AxiosRequestConfig<any> | undefined,
+  ): Promise<AxiosResponse<T, D>> {
     return await this.httpService.delete(url, config);
   }
 }

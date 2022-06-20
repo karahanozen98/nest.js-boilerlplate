@@ -1,12 +1,15 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import type { Observable } from 'rxjs';
+
 import { publicCache, sessionCache } from '../common/cache';
-import { CacheOptions, ICache } from '../common/cache/interface';
+import type { ICache, ICacheOptions } from '../common/cache/interface';
 
 export abstract class AbstractCacheInterceptor implements NestInterceptor {
   protected cache: ICache;
-  protected options: CacheOptions | undefined;
-  constructor(opt?: CacheOptions) {
+
+  protected options: ICacheOptions | undefined;
+
+  constructor(opt?: ICacheOptions) {
     this.options = opt;
     this.cache = opt?.public ? publicCache : sessionCache;
   }
@@ -24,6 +27,7 @@ export abstract class AbstractCacheInterceptor implements NestInterceptor {
         ? `public-${this.options.key}`
         : `public-${className}-${handlerName}`;
     }
+
     return this.options?.key
       ? `sessionId:${sessionId}-${this.options.key}`
       : `sessionId:${sessionId}-${className}-${handlerName}`;
@@ -34,13 +38,16 @@ export abstract class AbstractCacheInterceptor implements NestInterceptor {
       if (this.options.key) {
         return `public-${this.options.key}`;
       }
-      return await publicCache.keys(`public-${className}*`);
+
+      return publicCache.keys(`public-${className}*`);
     }
+
     if (this.options?.key) {
       return `sessionId:${sessionId}-${this.options.key}`;
     }
+
     // delete all items related to current controller
-    const allKeys = await sessionCache.keys(`sessionId:${sessionId}-${className}*`);
+    const allKeys = sessionCache.keys(`sessionId:${sessionId}-${className}*`);
 
     return allKeys;
   }

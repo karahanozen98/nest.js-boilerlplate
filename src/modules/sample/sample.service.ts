@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { WebClientService } from 'shared/services/web-client.service';
-import { CreateSampleDto } from './dto/request/createSampleRequestDto';
-import { PersonResponseDto } from './dto/response/personResponseDto';
+
+import type { CreateSampleDto } from './dto/request/createSampleRequestDto';
+import { PersonResponseDto } from './dto/response/person-response.dto';
 
 @Injectable()
 export class SampleService {
@@ -13,11 +14,13 @@ export class SampleService {
 
   async list(): Promise<any> {
     const { data } = await this.webClientService.get('people');
+
     return data;
   }
 
   async get(id: string): Promise<PersonResponseDto> {
-    const { data } = await this.webClientService.get(`people/${id}`);
+    const { data } = await this.webClientService.get<PersonResponseDto>(`people/${id}`);
+
     return new PersonResponseDto(data);
   }
 
@@ -27,6 +30,7 @@ export class SampleService {
 
   translate() {
     throw new NotFoundException('sample.user.notFound');
+
     return this.i18nService.t('sample.user.found');
   }
 }

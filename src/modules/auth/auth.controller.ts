@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Res, Session, UnauthorizedException } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger/dist';
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger/dist';
+import { Throttle } from '@nestjs/throttler';
 import { AllowAnonymous } from 'decorators';
 import { Response } from 'express';
+
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/loginDto';
-import { Throttle } from '@nestjs/throttler';
 
 @AllowAnonymous()
 @ApiTags('Authorization')
@@ -15,15 +16,17 @@ export class AuthController {
 
   @Post('login')
   @AllowAnonymous()
-  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
-    const user = await this.authService.login(loginDto);
+  @ApiOkResponse()
+  login(@Body() loginDto: LoginDto) {
+    const user = this.authService.login(loginDto);
+
     return user;
   }
 
   @Post('logout')
+  @ApiOkResponse()
   async logout(@Res({ passthrough: true }) response: Response) {
     await this.authService.logout();
     response.clearCookie('sessionId');
-    return;
   }
 }

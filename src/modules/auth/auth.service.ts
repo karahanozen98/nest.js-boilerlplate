@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { UserNameOrPasswordIncorrectException } from 'exceptions';
 import { HttpContextService } from 'shared/services/http-context.service';
-import { LoginDto } from './dto/request/loginDto';
+
+import type { LoginDto } from './dto/request/loginDto';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly httpContextService: HttpContextService) {}
-  async login(loginDto: LoginDto) {
+
+  login(loginDto: LoginDto) {
     if (!this.validateUser()) {
       throw new UserNameOrPasswordIncorrectException();
     }

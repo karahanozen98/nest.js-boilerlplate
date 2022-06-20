@@ -1,14 +1,16 @@
-import * as path from 'path';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ModuleContainerModule } from 'modules';
-import { SharedModule } from 'shared/shared.module';
-import { AppController } from './app.controller';
-import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
-import { ApiConfigService } from 'shared/services/api-config.service';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HttpExceptionFilter } from 'filters';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ModuleContainerModule } from 'modules';
+import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
+import { join } from 'path';
+import { ApiConfigService } from 'shared/services/api-config.service';
+import { SharedModule } from 'shared/shared.module';
+
+import { AppController } from './app.controller';
+
 @Module({
   controllers: [AppController],
   imports: [
@@ -23,7 +25,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
       useFactory: (apiConfigService: ApiConfigService) => ({
         fallbackLanguage: apiConfigService.fallbackLanguage,
         loaderOptions: {
-          path: path.join(__dirname, '/i18n/'),
+          path: join(__dirname, '/i18n/'),
           watch: apiConfigService.isDevelopment,
         },
       }),

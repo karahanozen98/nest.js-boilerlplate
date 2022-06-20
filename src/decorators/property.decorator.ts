@@ -3,7 +3,7 @@ import type { ApiPropertyOptions } from '@nestjs/swagger';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type as ClassTransformerType } from 'class-transformer';
 import { IsArray, IsBoolean, IsNumber, IsString, ValidateNested } from 'class-validator';
-import type { ApiArrayPropertyParams } from 'interface';
+import type { IApiArrayPropertyParams } from 'interface';
 
 import { getVariableName } from '../common/utils/get-variable-name';
 
@@ -82,7 +82,7 @@ export function ApiClassProperty(options: { type: Function }) {
   );
 }
 
-export function ApiArrayProperty(options?: ApiArrayPropertyParams): PropertyDecorator {
+export function ApiArrayProperty(options?: IApiArrayPropertyParams): PropertyDecorator {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { type, each } = options || { type: undefined, each: true };
   const decorators = [ApiProperty({ type }), IsArray()];

@@ -5,13 +5,13 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiParam,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AllowAnonymous, CacheAdd, CacheClear } from 'decorators';
 import { ApiConfigService } from 'shared/services/api-config.service';
+
 import { CreateSampleDto } from './dto/request/createSampleRequestDto';
-import { PersonResponseDto } from './dto/response/personResponseDto';
+import { PersonResponseDto } from './dto/response/person-response.dto';
 import { SampleService } from './sample.service';
 
 @ApiTags('Sample')
@@ -42,9 +42,14 @@ export class SampleController {
   }
 
   @Get('nev')
+  @ApiOkResponse()
   getEnvironment(): string {
     let environment = '';
-    if (this.apiConfigService.isDevelopment) environment = 'dev';
+
+    if (this.apiConfigService.isDevelopment) {
+      environment = 'dev';
+    }
+
     return environment;
   }
 
@@ -59,8 +64,8 @@ export class SampleController {
 
   @Get('translate')
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({ type: 'any' })
-  async translate() {
+  @ApiOkResponse({ type: 'any' })
+  translate() {
     return this.sampleService.translate();
   }
 }

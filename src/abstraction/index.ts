@@ -1,1 +1,1 @@
-export * from './cacheInterceptor';
+export * from './cache.interceptor';

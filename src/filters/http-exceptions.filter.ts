@@ -1,5 +1,6 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
-import { Response } from 'express';
+import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
+import { Catch, HttpException } from '@nestjs/common';
+import type { Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 
 @Catch(HttpException)
@@ -11,7 +12,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
 
-    let message = exception.getResponse() as {
+    const message = exception.getResponse() as {
       message: string;
       args: Record<string, unknown>;
     };

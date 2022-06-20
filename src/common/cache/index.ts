@@ -1,12 +1,23 @@
 import { Logger } from '@nestjs/common';
+import type {
+  RedisClientOptions,
+  RedisClientType,
+  RedisFunctions,
+  RedisModules,
+  RedisScripts,
+} from 'redis';
 import { createClient } from 'redis';
-import { ICache } from './interface';
+
+import type { ICache } from './interface';
+
 const defaultTTL = 900; // 15 mins
 
 class Cache implements ICache {
-  private client: any;
+  private client: RedisClientType<any, any, any>;
 
-  createClient(options?: any): ICache {
+  createClient(
+    options?: RedisClientOptions<RedisModules, RedisFunctions, RedisScripts> | undefined,
+  ): ICache {
     this.client = createClient(options);
 
     this.client.on('error', (error: Error) => {
@@ -16,17 +27,21 @@ class Cache implements ICache {
       Logger.log('Redis connection established');
     });
 
-    (async () => {
+    void (async () => {
       await this.client.connect();
     })();
+
     return this;
   }
 
   async get(key: string): Promise<any> {
     try {
       const data = await this.client.get(key);
-      return JSON.parse(data);
+
+      return data ? JSON.parse(data) : null;
     } catch (error) {
+      console.error(error);
+
       return null;
     }
   }
@@ -36,13 +51,14 @@ class Cache implements ICache {
       return await this.client.keys(pattern);
     } catch (error) {
       console.error(error);
+
       return [];
     }
   }
 
-  async set(key: string, value: string | object): Promise<void> {
+  async set(key: string, value: string | Record<string, unknown>): Promise<void> {
     try {
-      let data = typeof value === 'object' ? JSON.stringify({ ...value }) : value;
+      const data = typeof value === 'object' ? JSON.stringify({ ...value }) : value;
       await this.client.set(key, data, { EX: defaultTTL });
     } catch (error) {
       console.error(error);
@@ -51,7 +67,9 @@ class Cache implements ICache {
 
   async del(key: string | string[]) {
     try {
-      if (key && key.length > 0) await this.client.del(key);
+      if (key && key.length > 0) {
+        await this.client.del(key);
+      }
     } catch (error) {
       console.error(error);
     }

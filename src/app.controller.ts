@@ -5,9 +5,9 @@ import { AllowAnonymous } from 'decorators';
 @Controller()
 @AllowAnonymous()
 @ApiTags('Root')
-@ApiResponse({ type: 'string' })
 export class AppController {
   @Get()
+  @ApiResponse({ type: 'string' })
   rootMessage(): string {
     return 'Healthy';
   }

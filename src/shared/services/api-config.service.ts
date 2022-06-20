@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ENVIRONMENT } from 'constant';
+import { ENVIRONMENT } from 'common/constants';
 
 @Injectable()
 export class ApiConfigService {
@@ -71,9 +71,11 @@ export class ApiConfigService {
 
   private get(key: string): string {
     const value = this.configService.get<string>(key);
+
     if (!value) {
       throw new Error(key + ' environment variable does not set');
     }
+
     return value;
   }
 }
