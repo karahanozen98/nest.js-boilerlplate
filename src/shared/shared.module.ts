@@ -6,21 +6,17 @@ import { PublicCacheService } from './services/public-cache.service';
 import { SessionCacheService } from './services/session-cache.service';
 import { WebClientService } from './services/web-client.service';
 
+const providers = [
+  ApiConfigService,
+  WebClientService,
+  SessionCacheService,
+  PublicCacheService,
+  HttpContextService,
+];
+
 @Global()
 @Module({
-  providers: [
-    ApiConfigService,
-    WebClientService,
-    SessionCacheService,
-    PublicCacheService,
-    HttpContextService,
-  ],
-  exports: [
-    ApiConfigService,
-    WebClientService,
-    SessionCacheService,
-    PublicCacheService,
-    HttpContextService,
-  ],
+  providers,
+  exports: [...providers],
 })
 export class SharedModule {}
