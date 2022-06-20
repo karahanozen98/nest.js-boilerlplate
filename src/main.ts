@@ -1,22 +1,24 @@
-import helmet from 'helmet';
-import morgan from 'morgan';
+import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import compression from 'compression';
+import createRedisStore from 'connect-redis';
+import { globalPrefixExcludeList } from 'constant';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import createRedisStore from 'connect-redis';
-import { createClient } from 'redis';
-import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { setupSwagger } from 'helpers';
-import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
-import { SharedModule } from 'shared/shared.module';
-import { ApiConfigService } from 'shared/services/api-config.service';
 import { UnprocessableEntityExceptionFilter } from 'filters';
-import { GlobalValidationPipe } from 'pipes/global-validation-pipe';
-import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import { AuthGuard } from 'guards/auth.guard';
+import helmet from 'helmet';
+import { setupSwagger } from 'helpers';
+import morgan from 'morgan';
 import { join } from 'path';
-import { globalPrefixExcludeList } from 'constant';
+import { GlobalValidationPipe } from 'pipes/global-validation-pipe';
+import { createClient } from 'redis';
+import { ApiConfigService } from 'shared/services/api-config.service';
+import { SharedModule } from 'shared/shared.module';
+
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {
@@ -26,7 +28,7 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   const configService = app.select(SharedModule).get(ApiConfigService);
 
-  const RedisStore = createRedisStore(session);
+  const redisStore = createRedisStore(session);
   const redisClient = createClient({
     url: configService.apiConfig.sessionCacheUrl,
     legacyMode: true, // RedisStore currently not working with redis version 4.0 or above
@@ -46,7 +48,7 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
       cookie: { httpOnly: true, secure: configService.isProduction, maxAge: 1000 * 60 * 60 * 8 },
-      store: new RedisStore({
+      store: new redisStore({
         client: redisClient,
       }),
     }),
@@ -73,6 +75,8 @@ async function bootstrap() {
 
   await app.listen(configService.apiConfig.port);
   Logger.log(`Application running on ${await app.getUrl()}`);
+
   return app;
 }
-bootstrap();
+
+void bootstrap();

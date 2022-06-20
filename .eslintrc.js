@@ -39,7 +39,7 @@ module.exports = {
      */
     'import/export': 'error',
     'import/first': 'error',
-    'import/no-unresolved': 'error',
+    'import/no-unresolved': 'off',
     'import/named': 'error',
     'import/namespace': 'error',
     'import/no-duplicates': 'error',
@@ -52,7 +52,7 @@ module.exports = {
     'import/no-cycle': 'off',
     'import/no-unused-modules': 'error',
     'import/no-namespace': 'error',
-    'import/extensions': ['error', 'never'],
+    'import/extensions': 0,
     'import/no-useless-path-segments': [
       'error',
       {
@@ -382,7 +382,7 @@ module.exports = {
       },
     ],
     'unicorn/import-index': 'error',
-    'unicorn/import-style': 'error',
+    'unicorn/import-style': 'off',
     'unicorn/new-for-builtins': 'error',
     'unicorn/no-abusive-eslint-disable': 'error',
     'unicorn/no-array-callback-reference': 'error',
