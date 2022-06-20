@@ -1,4 +1,4 @@
-import { ValidationOptions } from 'class-validator';
+import type { ValidationOptions } from 'class-validator';
 import { IsPhoneNumber as isPhoneNumber, registerDecorator, ValidateIf } from 'class-validator';
 
 export function IsPassword(validationOptions?: ValidationOptions): PropertyDecorator {
@@ -11,7 +11,10 @@ export function IsPassword(validationOptions?: ValidationOptions): PropertyDecor
       options: validationOptions,
       validator: {
         validate(value: string) {
-          if (typeof value !== 'string') return false;
+          if (typeof value !== 'string') {
+            return false;
+          }
+
           return /^[\d!#$%&*@A-Z^a-z]*$/.test(value);
         },
         defaultMessage(): string {

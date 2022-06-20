@@ -3,7 +3,8 @@ import type { ApiPropertyOptions } from '@nestjs/swagger';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type as ClassTransformerType } from 'class-transformer';
 import { IsArray, IsBoolean, IsNumber, IsString, ValidateNested } from 'class-validator';
-import { ApiArrayPropertyParams } from 'interface';
+import type { ApiArrayPropertyParams } from 'interface';
+
 import { getVariableName } from '../common/utils/get-variable-name';
 
 export function ApiStringProperty(): PropertyDecorator {
@@ -70,8 +71,10 @@ export function ApiEnumPropertyOptional<TEnum>(
   return ApiEnumProperty(getEnum, { required: false, ...options });
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function ApiClassProperty(options: { type: Function }) {
   const { type } = options;
+
   return applyDecorators(
     ApiProperty({ type }),
     ValidateNested(),
@@ -80,22 +83,37 @@ export function ApiClassProperty(options: { type: Function }) {
 }
 
 export function ApiArrayProperty(options?: ApiArrayPropertyParams): PropertyDecorator {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { type, each } = options || { type: undefined, each: true };
-  const decorators = [ApiProperty({ type: type }), IsArray()];
+  const decorators = [ApiProperty({ type }), IsArray()];
 
   if (!type) {
     return applyDecorators(...decorators);
-  } else if (type === Number) {
-    decorators.push(IsNumber({}, { each }));
-  } else if (type === String) {
-    decorators.push(IsString({ each }));
-  } else if (type === Boolean) {
-    decorators.push(IsBoolean({ each }));
-  } else {
-    decorators.push(
-      ValidateNested({ each }),
-      ClassTransformerType(() => type),
-    );
   }
+
+  switch (type) {
+    case Number: {
+      decorators.push(IsNumber({}, { each }));
+      break;
+    }
+
+    case String: {
+      decorators.push(IsString({ each }));
+      break;
+    }
+
+    case Boolean: {
+      decorators.push(IsBoolean({ each }));
+      break;
+    }
+
+    default: {
+      decorators.push(
+        ValidateNested({ each }),
+        ClassTransformerType(() => type),
+      );
+    }
+  }
+
   return applyDecorators(...decorators);
 }

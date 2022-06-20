@@ -1,6 +1,5 @@
-import { UseInterceptors } from '@nestjs/common';
-import { applyDecorators } from '@nestjs/common';
-import { CacheOptions } from 'common/cache/interface';
+import { applyDecorators, UseInterceptors } from '@nestjs/common';
+import type { CacheOptions } from 'common/cache/interface';
 import { ClearCacheInterceptor, UseCacheInterceptor } from 'interceptors/';
 
 export function CacheAdd(options?: CacheOptions | undefined): MethodDecorator {
