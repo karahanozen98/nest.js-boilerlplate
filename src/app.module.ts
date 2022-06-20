@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, Scope } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HttpExceptionFilter } from 'filters';
+import { AuthGuard } from 'guards/auth.guard';
 import { ModuleContainerModule } from 'modules';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
@@ -38,6 +39,11 @@ import { AppController } from './app.controller';
     ModuleContainerModule,
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+      scope: Scope.REQUEST,
+    },
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,

@@ -1,10 +1,11 @@
-import { Session } from 'express-session';
+import type { Session } from 'express-session';
 
-export interface SessionUser {
+export interface ISessionUser {
   username: string;
   lastLoginDate: string;
+  roles: string[];
 }
 
-export interface RequestSession extends Session {
-  user: SessionUser;
+export interface IRequestSession extends Session {
+  user: ISessionUser;
 }

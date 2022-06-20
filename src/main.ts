@@ -8,7 +8,6 @@ import createRedisStore from 'connect-redis';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { UnprocessableEntityExceptionFilter } from 'filters';
-import { AuthGuard } from 'guards/auth.guard';
 import helmet from 'helmet';
 import { setupSwagger } from 'helpers';
 import morgan from 'morgan';
@@ -57,7 +56,6 @@ async function bootstrap() {
   app.useGlobalFilters(new UnprocessableEntityExceptionFilter());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
   app.useGlobalPipes(new GlobalValidationPipe());
-  app.useGlobalGuards(new AuthGuard(reflector));
 
   app.setGlobalPrefix('api', { exclude: globalPrefixExcludeList });
 

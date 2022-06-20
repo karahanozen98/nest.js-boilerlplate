@@ -19,6 +19,7 @@ export class AuthService {
     const user = {
       username: loginDto.username,
       lastLoginDate: new Date().toISOString(),
+      roles: [],
     };
 
     this.httpContextService.setUser(user);

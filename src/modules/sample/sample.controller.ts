@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -7,15 +16,17 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { AllowAnonymous, CacheAdd, CacheClear } from 'decorators';
+import { AllowAnonymous, CacheAdd, CacheClear, Roles } from 'decorators';
+import { RolesGuard } from 'guards/roles.guard';
 import { ApiConfigService } from 'shared/services/api-config.service';
 
 import { CreateSampleDto } from './dto/request/createSampleRequestDto';
 import { PersonResponseDto } from './dto/response/person-response.dto';
 import { SampleService } from './sample.service';
 
-@ApiTags('Sample')
 @Controller({ path: '/sample', version: '1' })
+@ApiTags('Sample')
+@UseGuards(RolesGuard)
 export class SampleController {
   constructor(
     private readonly sampleService: SampleService,
@@ -43,14 +54,9 @@ export class SampleController {
 
   @Get('nev')
   @ApiOkResponse()
+  @Roles('Admin')
   getEnvironment(): string {
-    let environment = '';
-
-    if (this.apiConfigService.isDevelopment) {
-      environment = 'dev';
-    }
-
-    return environment;
+    return this.apiConfigService.isDevelopment ? 'development' : 'production';
   }
 
   @Post('create')

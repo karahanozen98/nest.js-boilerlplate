@@ -1,13 +1,17 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Observable } from 'rxjs';
+import { HttpContextService } from 'shared/services/http-context.service';
 
 import { ALLOW_ANON_KEY } from '../common/constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly httpContextService: HttpContextService,
+  ) {}
 
   canActivate(ctx: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     try {
@@ -19,21 +23,13 @@ export class AuthGuard implements CanActivate {
         return true;
       }
 
-      const session = ctx.switchToHttp().getRequest().session;
+      const user = this.httpContextService.getUser();
 
-      if (!session) {
-        return false;
-      }
-
-      return this.validateRequest(session.user);
+      return user ? true : false;
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
 
       return false;
     }
-  }
-
-  private validateRequest(user: any) {
-    return Boolean(user);
   }
 }
