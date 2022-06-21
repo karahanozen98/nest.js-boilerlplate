@@ -83,9 +83,8 @@ export function ApiClassProperty(options: { type: Function }) {
 }
 
 export function ApiArrayProperty(options?: IApiArrayPropertyParams): PropertyDecorator {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { type, each } = options || { type: undefined, each: true };
-  const decorators = [ApiProperty({ type }), IsArray()];
+  const type = options?.type;
+  const decorators = [ApiProperty({ type: [type || 'string'] }), IsArray()];
 
   if (!type) {
     return applyDecorators(...decorators);
@@ -93,23 +92,23 @@ export function ApiArrayProperty(options?: IApiArrayPropertyParams): PropertyDec
 
   switch (type) {
     case Number: {
-      decorators.push(IsNumber({}, { each }));
+      decorators.push(IsNumber({}, { each: true }));
       break;
     }
 
     case String: {
-      decorators.push(IsString({ each }));
+      decorators.push(IsString({ each: true }));
       break;
     }
 
     case Boolean: {
-      decorators.push(IsBoolean({ each }));
+      decorators.push(IsBoolean({ each: true }));
       break;
     }
 
     default: {
       decorators.push(
-        ValidateNested({ each }),
+        ValidateNested({ each: true }),
         ClassTransformerType(() => type),
       );
     }
