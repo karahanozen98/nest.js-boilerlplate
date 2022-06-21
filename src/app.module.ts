@@ -29,6 +29,7 @@ import { AppController } from './app.controller';
           path: join(__dirname, '/i18n/'),
           watch: apiConfigService.isDevelopment,
         },
+        viewEngine: 'ejs',
       }),
     }),
     ThrottlerModule.forRoot({
@@ -47,6 +48,7 @@ import { AppController } from './app.controller';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+      scope: Scope.REQUEST,
     },
     {
       provide: APP_GUARD,

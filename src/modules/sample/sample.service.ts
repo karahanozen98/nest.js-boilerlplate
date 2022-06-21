@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { I18nService } from 'nestjs-i18n';
+import { LanguageService } from 'shared/services/language.service';
 import { WebClientService } from 'shared/services/web-client.service';
 
 import type { CreateSampleDto } from './dto/request/create-sample-request.dto';
@@ -9,7 +9,7 @@ import { PersonResponseDto } from './dto/response/person-response.dto';
 export class SampleService {
   constructor(
     private readonly webClientService: WebClientService,
-    private readonly i18nService: I18nService,
+    private readonly languageService: LanguageService,
   ) {}
 
   async list(): Promise<any> {
@@ -31,6 +31,6 @@ export class SampleService {
   translate() {
     throw new NotFoundException('sample.user.notFound');
 
-    return this.i18nService.t('sample.user.found');
+    return this.languageService.translate('sample.user.found');
   }
 }
