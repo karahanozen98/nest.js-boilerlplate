@@ -20,7 +20,7 @@ import { AllowAnonymous, CacheAdd, CacheClear, Roles } from 'decorators';
 import { RolesGuard } from 'guards/roles.guard';
 import { ApiConfigService } from 'shared/services/api-config.service';
 
-import { CreateSampleDto } from './dto/request/createSampleRequestDto';
+import { CreateSampleDto } from './dto/request/create-sample-request.dto';
 import { PersonResponseDto } from './dto/response/person-response.dto';
 import { SampleService } from './sample.service';
 

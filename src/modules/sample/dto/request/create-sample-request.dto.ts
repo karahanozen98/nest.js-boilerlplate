@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsPassword,
-  IsUndefinable,
-  ApiStringProperty,
-  ApiNumberProperty,
   ApiArrayProperty,
   ApiClassProperty,
+  ApiNumberProperty,
+  ApiStringProperty,
+  IsPassword,
+  IsUndefinable,
 } from 'decorators/';
 
 class Planet {

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { WebClientService } from 'shared/services/web-client.service';
 
-import type { CreateSampleDto } from './dto/request/createSampleRequestDto';
+import type { CreateSampleDto } from './dto/request/create-sample-request.dto';
 import { PersonResponseDto } from './dto/response/person-response.dto';
 
 @Injectable()
