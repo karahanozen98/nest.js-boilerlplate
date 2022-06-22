@@ -16,7 +16,7 @@ export class LanguageService {
     return this.context.lang;
   }
 
-  translate(key: string, options?: TranslateOptions | undefined) {
+  translate(key: string, options?: TranslateOptions | undefined): string {
     return this.context.translate(key, {
       lang: options?.lang || this.lang,
       args: options?.args,
