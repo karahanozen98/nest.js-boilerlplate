@@ -21,13 +21,11 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
     }
 
     const key = this.generateKey(session.id, ctx.getClass().name, ctx.getHandler().name);
-
-    // find key in cache and send with response
     const data = await this.cache.get(key);
 
     if (data && data._originalUrl === request.originalUrl) {
       if (this.options?.expiration !== ExpirationType.absolute) {
-        void this.cache.set(key, { ...data, _originalUrl: request.originalUrl }); // update expire date
+        void this.cache.set(key, data); // update expire date
       }
 
       delete data._originalUrl;
@@ -54,16 +52,21 @@ export class ClearCacheInterceptor extends AbstractCacheInterceptor {
     super(opt);
   }
 
-  async intercept(ctx: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+  intercept(ctx: ExecutionContext, next: CallHandler): Observable<any> {
     const request = ctx.switchToHttp().getRequest();
-    // eslint-disable-next-line padding-line-between-statements
-    if (!request.cookies.sessionId) {
+    const session = request.session;
+
+    if (!this.options?.public && !session.user) {
       return next.handle();
     }
 
-    const keys = await this.resolveKey(request.cookies.sessionId, ctx.getClass().name);
-    void this.cache.del(keys);
+    void this.clearKeys(session.id, ctx.getClass().name);
 
     return next.handle();
+  }
+
+  private async clearKeys(sessionId: string, className: string) {
+    const keys = await this.resolveKey(sessionId, className);
+    void this.cache.del(keys);
   }
 }

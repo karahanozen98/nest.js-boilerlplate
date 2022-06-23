@@ -40,7 +40,7 @@ class Cache implements ICache {
 
       return data ? JSON.parse(data) : null;
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
 
       return null;
     }
@@ -50,7 +50,7 @@ class Cache implements ICache {
     try {
       return await this.client.keys(pattern);
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
 
       return [];
     }
@@ -61,7 +61,7 @@ class Cache implements ICache {
       const data = typeof value === 'object' ? JSON.stringify({ ...value }) : value;
       await this.client.set(key, data, { EX: defaultTTL });
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
     }
   }
 
@@ -71,7 +71,7 @@ class Cache implements ICache {
         await this.client.del(key);
       }
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
     }
   }
 }

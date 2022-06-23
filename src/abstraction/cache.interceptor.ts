@@ -39,7 +39,7 @@ export abstract class AbstractCacheInterceptor implements NestInterceptor {
         return `public-${this.options.key}`;
       }
 
-      return publicCache.keys(`public-${className}*`);
+      return await publicCache.keys(`public-${className}*`);
     }
 
     if (this.options?.key) {
@@ -47,7 +47,7 @@ export abstract class AbstractCacheInterceptor implements NestInterceptor {
     }
 
     // delete all items related to current controller
-    const allKeys = sessionCache.keys(`sessionId:${sessionId}-${className}*`);
+    const allKeys = await sessionCache.keys(`sessionId:${sessionId}-${className}*`);
 
     return allKeys;
   }

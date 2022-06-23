@@ -1,4 +1,5 @@
 import type { INestApplication } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export function setupSwagger(app: INestApplication): void {
@@ -18,5 +19,5 @@ export function setupSwagger(app: INestApplication): void {
     },
   });
 
-  console.info(`Documentation: http://localhost:${process.env.PORT}/documentation`);
+  Logger.log(`Documentation: http://localhost:${process.env.PORT}/documentation`);
 }
