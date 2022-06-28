@@ -7,6 +7,7 @@ import { AuthGuard } from 'guards/auth.guard';
 import { ModuleContainerModule } from 'modules';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
+import { WebClientModule } from 'shared/modules/web-client.module';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { SharedModule } from 'shared/shared.module';
 
@@ -18,6 +19,16 @@ import { AppController } from './app.controller';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env.dev',
+    }),
+    WebClientModule.forRootAsync({
+      inject: [ApiConfigService],
+      useFactory: (apiConfigService: ApiConfigService) => ({
+        baseURL: apiConfigService.apiConfig.baseUrl,
+        timeout: 1000 * 60 * 3,
+        maxRedirects: 5,
+        timeoutErrorMessage: 'UPT Bff - Http Request timeout',
+        withCredentials: true,
+      }),
     }),
     I18nModule.forRootAsync({
       resolvers: [AcceptLanguageResolver],

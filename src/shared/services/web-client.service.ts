@@ -1,22 +1,16 @@
-import { HttpException, Injectable } from '@nestjs/common';
+/* eslint-disable @moneteam/nestjs/injectable-should-be-provided */
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
+import { WEB_CLIENT_CONFIG } from 'common/constants';
 import { AxiosNoResponseException, AxiosRequestFailedException } from 'exceptions';
-
-import { ApiConfigService } from './api-config.service';
 
 @Injectable()
 export class WebClientService {
   httpService: AxiosInstance;
 
-  constructor(private readonly apiConfigService: ApiConfigService) {
-    this.httpService = axios.create({
-      baseURL: this.apiConfigService.apiConfig.baseUrl,
-      timeout: 1000 * 60 * 3,
-      maxRedirects: 5,
-      timeoutErrorMessage: 'UPT Bff - Http Request timeout',
-      withCredentials: true,
-    });
+  constructor(@Inject(WEB_CLIENT_CONFIG) config: AxiosRequestConfig<any> | undefined) {
+    this.httpService = axios.create(config);
 
     this.httpService.interceptors.response.use(
       (value) => value,
