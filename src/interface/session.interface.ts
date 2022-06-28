@@ -6,6 +6,6 @@ export interface ISessionUser {
 
 export interface IRequestSession {
   id: string;
-  user: ISessionUser;
+  user?: ISessionUser;
   destroy: (cb: () => void) => void;
 }

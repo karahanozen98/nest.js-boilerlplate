@@ -13,7 +13,7 @@ export class HttpContextService {
     @Inject(REQUEST) private readonly req: Request,
     private readonly sessionCacheService: SessionCacheService,
   ) {
-    this.session = this.req.session as IRequestSession;
+    this.session = req.session;
   }
 
   get request(): Request {
@@ -24,7 +24,7 @@ export class HttpContextService {
     return this.session;
   }
 
-  getUser(): ISessionUser {
+  getUser(): ISessionUser | undefined {
     return this.session.user;
   }
 
