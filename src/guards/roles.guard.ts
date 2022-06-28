@@ -22,6 +22,11 @@ export class RolesGuard implements CanActivate {
     }
 
     const user = this.httpContextService.getUser();
+
+    if (!user) {
+      return false;
+    }
+
     const isMatched = roles.some((requestedRole) =>
       user.roles.includes(requestedRole) ? true : false,
     );
