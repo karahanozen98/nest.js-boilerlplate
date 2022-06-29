@@ -16,7 +16,8 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
     const session = request.session;
     ctx.switchToRpc().getContext();
 
-    if (!this.options?.public && !session.user) {
+    // don't cache respobse if no session avaiable or request is not GET request
+    if ((!this.options?.public && !session.user) || request.method !== 'GET') {
       return next.handle();
     }
 
@@ -28,20 +29,13 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
         void this.cache.set(key, data); // update expire date
       }
 
-      delete data._originalUrl;
-
-      return of(data);
-    }
-
-    // don't cache data if not GET request
-    if (request.method !== 'GET') {
-      return next.handle();
+      return of(data.response);
     }
 
     // add data to cache
     return next.handle().pipe(
       tap((response) => {
-        void this.cache.set(key, { ...response, _originalUrl: request.originalUrl });
+        void this.cache.set(key, { response, _originalUrl: request.originalUrl });
       }),
     );
   }
