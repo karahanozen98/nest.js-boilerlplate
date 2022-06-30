@@ -28,9 +28,9 @@ import { CreateSampleDto } from './dto/request/create-sample-request.dto';
 import { PersonResponseDto } from './dto/response/person-response.dto';
 import { SampleService } from './sample.service';
 
-@Controller({ path: '/sample', version: '1' })
 @ApiTags('Sample')
 @UseGuards(RolesGuard)
+@Controller({ path: '/sample', version: '1' })
 export class SampleController extends BaseController {
   constructor(
     private readonly sampleService: SampleService,
@@ -51,7 +51,7 @@ export class SampleController extends BaseController {
     return this.ok(list);
   }
 
-  @Get('/list')
+  @Get('list')
   @HttpCode(HttpStatus.OK)
   @ApiBaseOkResponse({ type: [PersonResponseDto] })
   @ApiBadRequestResponse({ description: 'Bad Request' })
@@ -63,7 +63,7 @@ export class SampleController extends BaseController {
     return this.ok(list);
   }
 
-  @Get('/person/:id')
+  @Get('person/:id')
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: 'id' })
   @ApiBaseOkResponse({ description: 'Find Person by id', type: PersonResponseDto })

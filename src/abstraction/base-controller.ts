@@ -1,4 +1,4 @@
-import type { PageDto } from 'common/constants';
+import { PageDto } from 'common/constants';
 import type { PageMetaDto } from 'common/dto/page-meta.dto';
 
 export interface IBaseResponse<T = any> {
@@ -19,8 +19,8 @@ export abstract class BaseController {
 
   ok<T = any>(result?: T | undefined): IBaseResponse<T>;
 
-  ok(response?: any): any {
-    if (response && response.pagination) {
+  ok<T>(response?: T | PageDto<T>): any {
+    if (response instanceof PageDto) {
       return response.toResponse();
     }
 
