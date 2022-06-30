@@ -447,5 +447,6 @@ module.exports = {
     'unicorn/prevent-abbreviations': 'off',
     'unicorn/string-content': 'off',
     'unicorn/throw-new-error': 'error',
+    '@moneteam/nestjs/api-method-should-specify-api-response': 'off',
   },
 };

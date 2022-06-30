@@ -1,7 +1,7 @@
 import { EnumFieldOptional, NumberFieldOptional, StringFieldOptional } from '../../decorators';
 import { Order } from '../constants';
 
-export class PageOptionsDto {
+export class PageOptions {
   @EnumFieldOptional(() => Order, {
     default: Order.ASC,
   })
@@ -28,4 +28,18 @@ export class PageOptionsDto {
 
   @StringFieldOptional()
   readonly q?: string;
+
+  constructor({
+    page = 1,
+    take = 10,
+    order = Order.ASC,
+  }: {
+    page: number;
+    take: number;
+    order: Order;
+  }) {
+    this.page = page;
+    this.take = take;
+    this.order = order;
+  }
 }

@@ -13,7 +13,7 @@ export class PersonResponseDto {
   @ApiProperty({ default: 80 })
   mass: number;
 
-  constructor({ id, name, height, mass }) {
+  constructor({ id, name, height, mass }: any) {
     this.id = id;
     this.name = name;
     this.height = height;

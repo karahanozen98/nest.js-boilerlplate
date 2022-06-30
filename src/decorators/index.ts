@@ -1,4 +1,4 @@
-export * from './api-page-ok-response.decorator';
+export * from './api-response.decorator';
 export * from './auth.decorator';
 export * from './cache.decorator';
 export * from './fields.decorator';

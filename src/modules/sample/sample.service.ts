@@ -1,4 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { PageDto } from 'common/constants';
+import { PageMetaDto } from 'common/dto/page-meta.dto';
+import type { PageOptions } from 'common/dto/page-options.dto';
 import { LanguageService } from 'shared/services/language.service';
 import { WebClientService } from 'shared/services/web-client.service';
 
@@ -12,10 +15,19 @@ export class SampleService {
     private readonly languageService: LanguageService,
   ) {}
 
-  async list(): Promise<any> {
-    const { data } = await this.webClientService.get('people');
+  async list(pageOptions: PageOptions): Promise<PageDto<PersonResponseDto>> {
+    const { data } = await this.webClientService.get<{ results: []; count: number }>('people');
+    const mappedList = data.results.map((item: any) => new PersonResponseDto(item));
+    const result = new PageDto(mappedList, new PageMetaDto({ itemCount: data.count, pageOptions }));
 
-    return data;
+    return result;
+  }
+
+  async listAll(): Promise<PersonResponseDto[]> {
+    const { data } = await this.webClientService.get<{ results: []; count: number }>('people');
+    const mappedList = data.results.map((item: any) => new PersonResponseDto(item));
+
+    return mappedList;
   }
 
   async get(id: string): Promise<PersonResponseDto> {

@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { PageMetaDto } from 'common/dto/page-meta.dto';
 
 export function setupSwagger(app: INestApplication): void {
   const documentBuilder = new DocumentBuilder()
@@ -12,7 +13,10 @@ export function setupSwagger(app: INestApplication): void {
     documentBuilder.setVersion(process.env.API_VERSION);
   }
 
-  const document = SwaggerModule.createDocument(app, documentBuilder.build());
+  const document = SwaggerModule.createDocument(app, documentBuilder.build(), {
+    extraModels: [PageMetaDto],
+  });
+
   SwaggerModule.setup('documentation', app, document, {
     swaggerOptions: {
       persistAuthorization: true,

@@ -1,16 +1,23 @@
-import { ApiProperty } from '@nestjs/swagger';
+import type { IPaginatedResponse } from 'abstraction';
 
-import { PageMetaDto } from './page-meta.dto';
+import type { PageMetaDto } from './page-meta.dto';
 
 export class PageDto<T> {
-  @ApiProperty({ isArray: true })
-  readonly data: T[];
+  readonly result: T[];
 
-  @ApiProperty()
-  readonly meta: PageMetaDto;
+  readonly pagination: PageMetaDto;
 
-  constructor(data: T[], meta: PageMetaDto) {
-    this.data = data;
-    this.meta = meta;
+  constructor(result: T[], meta: PageMetaDto) {
+    this.result = result;
+    this.pagination = meta;
+  }
+
+  toResponse(): IPaginatedResponse<T> {
+    return {
+      result: this.result,
+      success: true,
+      error: null,
+      pagination: this.pagination,
+    };
   }
 }

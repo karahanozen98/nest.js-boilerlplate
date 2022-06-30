@@ -8,15 +8,19 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import type { IPaginatedResponse } from 'abstraction';
+import { BaseController, IBaseResponse } from 'abstraction';
+import { PageOptions } from 'common/dto/page-options.dto';
 import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
-import { AllowAnonymous, CacheAdd, CacheClear, Roles } from 'decorators';
+  AllowAnonymous,
+  ApiBaseOkResponse,
+  ApiPageOkResponse,
+  CacheAdd,
+  CacheClear,
+  Roles,
+} from 'decorators';
+import { Pagination } from 'decorators/param.decorator';
 import { RolesGuard } from 'guards/roles.guard';
 import { ApiConfigService } from 'shared/services/api-config.service';
 
@@ -27,51 +31,71 @@ import { SampleService } from './sample.service';
 @Controller({ path: '/sample', version: '1' })
 @ApiTags('Sample')
 @UseGuards(RolesGuard)
-export class SampleController {
+export class SampleController extends BaseController {
   constructor(
     private readonly sampleService: SampleService,
     private readonly apiConfigService: ApiConfigService,
-  ) {}
+  ) {
+    super();
+  }
 
-  @Get()
+  @Get('search')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ description: 'List of users', type: [PersonResponseDto] })
+  @ApiPageOkResponse({ type: PersonResponseDto })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @CacheAdd()
+  @AllowAnonymous()
+  async list(@Pagination() pageOpts: PageOptions): Promise<IPaginatedResponse<PersonResponseDto>> {
+    const list = await this.sampleService.list(pageOpts);
+
+    return this.ok(list);
+  }
+
+  @Get('/list')
+  @HttpCode(HttpStatus.OK)
+  @ApiBaseOkResponse({ type: [PersonResponseDto] })
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @CacheAdd({ public: true })
   @AllowAnonymous()
-  async list(): Promise<PersonResponseDto> {
-    return await this.sampleService.list();
+  async listAll(): Promise<IBaseResponse<PersonResponseDto[]>> {
+    const list = await this.sampleService.listAll();
+
+    return this.ok(list);
   }
 
   @Get('/person/:id')
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', format: 'string' })
-  @ApiOkResponse({ description: 'Find Person by id', type: PersonResponseDto })
+  @ApiParam({ name: 'id' })
+  @ApiBaseOkResponse({ description: 'Find Person by id', type: PersonResponseDto })
   @CacheAdd()
-  async getPerson(@Param('id') id: string): Promise<PersonResponseDto> {
-    return await this.sampleService.get(id);
+  async getPerson(@Param('id') id: string): Promise<IBaseResponse<PersonResponseDto>> {
+    const person = await this.sampleService.get(id);
+
+    return this.ok(person);
   }
 
-  @Get('nev')
-  @ApiOkResponse()
+  @Get('isDev')
+  @ApiBaseOkResponse({ type: 'boolean' })
   @Roles('Admin')
-  getEnvironment(): string {
-    return this.apiConfigService.isDevelopment ? 'development' : 'production';
+  getEnvironment(): IBaseResponse<boolean> {
+    return this.ok(this.apiConfigService.isDevelopment ? true : false);
   }
 
   @Post('create')
   @HttpCode(HttpStatus.CREATED)
   @ApiBody({ type: CreateSampleDto })
-  @ApiCreatedResponse()
+  @ApiBaseOkResponse({ status: 201 })
   @CacheClear()
-  create(@Body() createSampleDto: CreateSampleDto) {
+  create(@Body() createSampleDto: CreateSampleDto): IBaseResponse {
     this.sampleService.create(createSampleDto);
+
+    return this.ok();
   }
 
   @Get('translate')
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: 'any' })
-  translate() {
-    return this.sampleService.translate();
+  @ApiBaseOkResponse({ type: 'string' })
+  translate(): IBaseResponse<string> {
+    return this.ok(this.sampleService.translate());
   }
 }
