@@ -1,13 +1,11 @@
-import type { IPaginatedResponse } from 'interface';
-
-import type { PageMetaDto } from './page-meta.dto';
+import type { IPageMetaDto, IPaginatedResponse } from 'interface';
 
 export class PageDto<T> {
   readonly result: T[];
 
-  readonly pagination: PageMetaDto;
+  readonly pagination: IPageMetaDto;
 
-  constructor(result: T[], meta: PageMetaDto) {
+  constructor(result: T[], meta: IPageMetaDto) {
     this.result = result;
     this.pagination = meta;
   }
