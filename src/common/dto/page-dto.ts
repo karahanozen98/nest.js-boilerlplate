@@ -1,4 +1,4 @@
-import type { IPaginatedResponse } from 'abstraction';
+import type { IPaginatedResponse } from 'interface';
 
 import type { PageMetaDto } from './page-meta.dto';
 

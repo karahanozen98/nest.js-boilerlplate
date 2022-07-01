@@ -1,18 +1,5 @@
 import { PageDto } from 'common/constants';
-import type { PageMetaDto } from 'common/dto/page-meta.dto';
-
-export interface IBaseResponse<T = any> {
-  result: T | undefined;
-  success: boolean;
-  error: Record<string, any> | null;
-}
-
-export interface IPaginatedResponse<T = any> {
-  result: T[];
-  success: boolean;
-  error: Record<string, any> | null;
-  pagination: PageMetaDto;
-}
+import type { IBaseResponse, IPaginatedResponse } from 'interface';
 
 export abstract class BaseController {
   ok<T>(pageDto: PageDto<T>): IPaginatedResponse<T>;

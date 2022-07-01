@@ -9,8 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
-import type { IPaginatedResponse } from 'abstraction';
-import { BaseController, IBaseResponse } from 'abstraction';
+import { BaseController } from 'abstraction';
 import { PageOptions } from 'common/dto/page-options.dto';
 import {
   AllowAnonymous,
@@ -22,6 +21,8 @@ import {
 } from 'decorators';
 import { Pagination } from 'decorators/param.decorator';
 import { RolesGuard } from 'guards/roles.guard';
+import type { IPaginatedResponse } from 'interface';
+import { IBaseResponse } from 'interface';
 import { ApiConfigService } from 'shared/services/api-config.service';
 
 import { CreateSampleDto } from './dto/request/create-sample-request.dto';
@@ -86,7 +87,7 @@ export class SampleController extends BaseController {
   @ApiBody({ type: CreateSampleDto })
   @ApiBaseOkResponse({ status: 201 })
   @CacheClear()
-  create(@Body() createSampleDto: CreateSampleDto): IBaseResponse {
+  create(@Body() createSampleDto: CreateSampleDto): IBaseResponse<any> {
     this.sampleService.create(createSampleDto);
 
     return this.ok();
