@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { BaseController } from 'abstraction';
-import { PageOptions } from 'common/dto/page-options.dto';
 import {
   AllowAnonymous,
   ApiBaseOkResponse,
@@ -22,7 +21,7 @@ import {
 import { Pagination } from 'decorators/param.decorator';
 import { RolesGuard } from 'guards/roles.guard';
 import type { IPaginatedResponse } from 'interface';
-import { IBaseResponse } from 'interface';
+import { IBaseResponse, IPageOptions } from 'interface';
 import { ApiConfigService } from 'shared/services/api-config.service';
 
 import { CreateSampleDto } from './dto/request/create-sample-request.dto';
@@ -46,7 +45,7 @@ export class SampleController extends BaseController {
   @ApiBadRequestResponse({ description: 'Bad Request' })
   @CacheAdd()
   @AllowAnonymous()
-  async list(@Pagination() pageOpts: PageOptions): Promise<IPaginatedResponse<PersonResponseDto>> {
+  async list(@Pagination() pageOpts: IPageOptions): Promise<IPaginatedResponse<PersonResponseDto>> {
     const list = await this.sampleService.list(pageOpts);
 
     return this.ok(list);

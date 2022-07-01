@@ -1,7 +1,9 @@
+import type { IPageOptions } from 'interface';
+
 import { EnumFieldOptional, NumberFieldOptional, StringFieldOptional } from '../../decorators';
 import { Order } from '../constants';
 
-export class PageOptions {
+export class PageOptions implements IPageOptions {
   @EnumFieldOptional(() => Order, {
     default: Order.ASC,
   })

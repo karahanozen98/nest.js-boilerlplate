@@ -1,3 +1,3 @@
+export * from './api.interface';
 export * from './api-property.interfaces';
-export * from './base-response.interface';
 export * from './session.interface';
