@@ -1,32 +1,36 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger/dist';
+import { Body, Post, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { AllowAnonymous } from 'decorators';
+import { BaseController } from 'abstraction';
+import { AllowAnonymous, ApiBaseOkResponse, ApiController } from 'decorators';
 import { Response } from 'express';
+import { IBaseResponse } from 'interface';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/loginDto';
 
 @AllowAnonymous()
-@ApiTags('Authorization')
-@Controller({ path: '/auth', version: '1' })
 @Throttle(5, 60)
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+@ApiController({ tags: ['Authorization'], path: 'auth', version: '1' })
+export class AuthController extends BaseController {
+  constructor(private readonly authService: AuthService) {
+    super();
+  }
 
   @Post('login')
   @AllowAnonymous()
-  @ApiOkResponse()
-  login(@Body() loginDto: LoginDto) {
+  @ApiBaseOkResponse()
+  login(@Body() loginDto: LoginDto): IBaseResponse<any> {
     const user = this.authService.login(loginDto);
 
-    return user;
+    return this.ok(user);
   }
 
   @Post('logout')
-  @ApiOkResponse()
+  @ApiBaseOkResponse()
   async logout(@Res({ passthrough: true }) response: Response) {
     await this.authService.logout();
     response.clearCookie('sessionId');
+
+    return this.ok();
   }
 }

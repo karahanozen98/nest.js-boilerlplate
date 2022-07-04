@@ -36,6 +36,7 @@ import { AppController } from './app.controller';
       inject: [ApiConfigService],
       useFactory: (apiConfigService: ApiConfigService) => ({
         fallbackLanguage: apiConfigService.fallbackLanguage,
+        logging: apiConfigService.isDevelopment,
         loaderOptions: {
           path: join(__dirname, '/i18n/'),
           watch: apiConfigService.isDevelopment,

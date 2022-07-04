@@ -1,3 +1,4 @@
+export * from './api-controller.decorator';
 export * from './api-response.decorator';
 export * from './auth.decorator';
 export * from './cache.decorator';

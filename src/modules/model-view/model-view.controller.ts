@@ -1,12 +1,11 @@
-import { Controller, Get, Render } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Get, Render } from '@nestjs/common';
+import { ApiOkResponse } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import { AllowAnonymous } from 'decorators';
+import { AllowAnonymous, ApiController } from 'decorators';
 
-@Controller('/view')
-@ApiTags('views')
 @SkipThrottle()
 @AllowAnonymous()
+@ApiController({ tags: ['views'], path: 'view' })
 export class ModelViewController {
   @Get()
   @ApiOkResponse()

@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 /* eslint-disable @typescript-eslint/ban-types */
 import type { Type } from '@nestjs/common';
 import { applyDecorators } from '@nestjs/common';
@@ -5,77 +6,61 @@ import { ApiExtraModels, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/sw
 import { Order } from 'common/constants';
 import { PageMetaDto } from 'common/dto/page-meta.dto';
 
-export function ApiBaseOkResponse<T extends Type | string | [Function]>(options: {
+interface IApiResponseOptions {
+  status: number;
+  description: string | undefined;
+  schema: any;
+}
+
+export function ApiBaseOkResponse<T extends Type | string | [Function]>(options?: {
   type?: T;
   status?: number;
   description?: string;
 }): MethodDecorator & ClassDecorator {
-  const opts = {
-    status: options.status,
-    description: options.description,
-  };
-
-  const defaults = {
-    success: {
-      type: 'boolean',
-    },
-    error: {
-      type: 'object',
-      example: null,
-    },
-  };
-
-  // if type is null or a string type example: 'boolean'
-  if (!options.type || typeof options.type === 'string') {
-    return applyDecorators(
-      ApiResponse({
-        ...opts,
-        schema: {
-          properties: {
-            result: {
-              type: options.type,
-            },
-            ...defaults,
-          },
+  const resOptions: IApiResponseOptions = {
+    status: options?.status ?? 200,
+    description: options?.description,
+    schema: {
+      properties: {
+        result: {},
+        success: {
+          type: 'boolean',
         },
-      }),
-    );
+        error: {
+          type: 'object',
+          example: null,
+        },
+      },
+    },
+  };
+
+  if (!options) {
+    resOptions.schema.properties.result = null;
+  }
+
+  // If type is null or a string type example: 'boolean'
+  else if (!options.type || typeof options.type === 'string') {
+    resOptions.schema.properties.result = { type: options.type };
   }
 
   // If type is Array, example: [UserDto]
-  if (typeof options.type === 'object') {
-    return applyDecorators(
-      ApiExtraModels(options.type[0]),
-      ApiResponse({
-        ...opts,
-        schema: {
-          properties: {
-            result: {
-              type: 'array',
-              items: { $ref: getSchemaPath(options.type[0]) },
-            },
-            ...defaults,
-          },
-        },
-      }),
-    );
+  else if (typeof options.type === 'object') {
+    applyDecorators(ApiExtraModels(options.type[0]));
+    resOptions.schema.properties.result = {
+      type: 'array',
+      items: { $ref: getSchemaPath(options.type[0]) },
+    };
   }
 
-  // type is a model example: UserDto
-  return applyDecorators(
-    ApiExtraModels(options.type),
-    ApiResponse({
-      ...opts,
-      schema: {
-        properties: {
-          result: {
-            $ref: getSchemaPath(options.type),
-          },
-          ...defaults,
-        },
-      },
-    }),
-  );
+  // If type is a model example: UserDto
+  else {
+    applyDecorators(ApiExtraModels(options.type));
+    resOptions.schema.properties.result = {
+      $ref: getSchemaPath(options.type),
+    };
+  }
+
+  return applyDecorators(ApiResponse(resOptions));
 }
 
 export function ApiPageOkResponse<T extends Type>(options: {

@@ -1,18 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { BaseController } from 'abstraction';
 import {
   AllowAnonymous,
   ApiBaseOkResponse,
+  ApiController,
   ApiPageOkResponse,
   CacheAdd,
   CacheClear,
@@ -28,9 +20,8 @@ import { CreateSampleDto } from './dto/request/create-sample-request.dto';
 import { PersonResponseDto } from './dto/response/person-response.dto';
 import { SampleService } from './sample.service';
 
-@ApiTags('Sample')
 @UseGuards(RolesGuard)
-@Controller({ path: '/sample', version: '1' })
+@ApiController({ tags: ['Sample'], path: 'sample', version: '1' })
 export class SampleController extends BaseController {
   constructor(
     private readonly sampleService: SampleService,
