@@ -15,16 +15,18 @@ const defaultTTL = 900; // 15 mins
 class Cache implements ICache {
   private client: RedisClientType<any, any, any>;
 
+  private logger: Logger = new Logger('Cache');
+
   createClient(
     options?: RedisClientOptions<RedisModules, RedisFunctions, RedisScripts> | undefined,
   ): ICache {
     this.client = createClient(options);
 
     this.client.on('error', (error: Error) => {
-      Logger.error('Redis client error: ', error);
+      this.logger.error('Redis client error: ', error);
     });
     this.client.on('connect', () => {
-      Logger.log('Redis connection established');
+      this.logger.log('Redis connection established');
     });
 
     void (async () => {
@@ -40,7 +42,7 @@ class Cache implements ICache {
 
       return data ? JSON.parse(data) : null;
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return null;
     }
@@ -50,7 +52,7 @@ class Cache implements ICache {
     try {
       return await this.client.keys(pattern);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return [];
     }
@@ -61,7 +63,7 @@ class Cache implements ICache {
       const data = typeof value === 'object' ? JSON.stringify({ ...value }) : value;
       await this.client.set(key, data, { EX: defaultTTL });
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
     }
   }
 
@@ -71,7 +73,7 @@ class Cache implements ICache {
         await this.client.del(key);
       }
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
     }
   }
 }

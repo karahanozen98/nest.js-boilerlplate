@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PageMetaDto } from 'common/dto/page-meta.dto';
 
 export function setupSwagger(app: INestApplication): void {
+  const logger = new Logger('Swagger');
   const documentBuilder = new DocumentBuilder()
     .setTitle('API')
     .setDescription('UPT Bff Documentation')
@@ -23,5 +24,5 @@ export function setupSwagger(app: INestApplication): void {
     },
   });
 
-  Logger.log(`Documentation: http://localhost:${process.env.PORT}/documentation`);
+  logger.log(`Documentation: http://localhost:${process.env.PORT}/documentation`);
 }
