@@ -21,34 +21,27 @@ export abstract class AbstractCacheInterceptor implements NestInterceptor {
     throw new Error('Method not implemented.');
   }
 
-  protected generateKey(sessionId: string, className: string, handlerName: string): string {
+  protected generateKey(sessionId: string, className: string, originalUrl: string): string {
     if (this.options?.public) {
       return this.options?.key
         ? `public-${this.options.key}`
-        : `public-${className}-${handlerName}`;
+        : `public-${className}-${originalUrl}`;
     }
 
     return this.options?.key
       ? `sessionId:${sessionId}-${this.options.key}`
-      : `sessionId:${sessionId}-${className}-${handlerName}`;
+      : `sessionId:${sessionId}-${className}-${originalUrl}`;
   }
 
   protected async resolveKey(sessionId: string, className: string): Promise<string | string[]> {
     if (this.options?.public) {
-      if (this.options.key) {
-        return `public-${this.options.key}`;
-      }
-
-      return await publicCache.keys(`public-${className}*`);
+      return this.options.key
+        ? `public-${this.options.key}`
+        : await publicCache.keys(`public-${className}*`);
     }
 
-    if (this.options?.key) {
-      return `sessionId:${sessionId}-${this.options.key}`;
-    }
-
-    // delete all items related to current controller
-    const allKeys = await sessionCache.keys(`sessionId:${sessionId}-${className}*`);
-
-    return allKeys;
+    return this.options?.key
+      ? `sessionId:${sessionId}-${this.options.key}`
+      : await sessionCache.keys(`sessionId:${sessionId}-${className}*`);
   }
 }

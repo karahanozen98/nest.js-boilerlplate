@@ -20,7 +20,7 @@ export interface ICache {
   createClient(
     options?: RedisClientOptions<RedisModules, RedisFunctions, RedisScripts> | undefined,
   ): ICache;
-  get(key: string): Promise<any>;
+  get(key: string): Promise<string | Record<string, any> | null>;
   keys(pattern: string): Promise<string[]>;
   set(key: string, value: string | Record<string, unknown>): Promise<void>;
   del(key: string | string[]): Promise<void>;

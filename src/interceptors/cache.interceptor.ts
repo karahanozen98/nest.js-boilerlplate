@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import type { CallHandler, ExecutionContext } from '@nestjs/common';
 import { AbstractCacheInterceptor } from 'abstraction';
 import type { ICacheOptions } from 'common/cache/interface';
 import { ExpirationType } from 'common/cache/interface';
+import type { Request } from 'interface';
 import type { Observable } from 'rxjs';
 import { of, tap } from 'rxjs';
 
@@ -12,7 +12,7 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
   }
 
   async intercept(ctx: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
-    const request = ctx.switchToHttp().getRequest();
+    const request = ctx.switchToHttp().getRequest<Request>();
     const session = request.session;
     ctx.switchToRpc().getContext();
 
@@ -21,10 +21,10 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
       return next.handle();
     }
 
-    const key = this.generateKey(session.id, ctx.getClass().name, ctx.getHandler().name);
-    const data = await this.cache.get(key);
+    const key = this.generateKey(session.id, ctx.getClass().name, request.originalUrl);
+    const data = (await this.cache.get(key)) as Record<string, any>;
 
-    if (data && data._originalUrl === request.originalUrl) {
+    if (data) {
       if (this.options?.expiration !== ExpirationType.absolute) {
         void this.cache.set(key, data); // update expire date
       }
@@ -35,7 +35,11 @@ export class UseCacheInterceptor extends AbstractCacheInterceptor {
     // add data to cache
     return next.handle().pipe(
       tap((response) => {
-        void this.cache.set(key, { response, _originalUrl: request.originalUrl });
+        void this.cache.set(key, {
+          response,
+          _originalUrl: request.originalUrl,
+          _correlationId: request.correlationId ?? '',
+        });
       }),
     );
   }
@@ -47,7 +51,7 @@ export class ClearCacheInterceptor extends AbstractCacheInterceptor {
   }
 
   intercept(ctx: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = ctx.switchToHttp().getRequest();
+    const request = ctx.switchToHttp().getRequest<Request>();
     const session = request.session;
 
     if (!this.options?.public && !session.user) {

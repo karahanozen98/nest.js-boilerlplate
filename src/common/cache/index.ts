@@ -36,11 +36,11 @@ class Cache implements ICache {
     return this;
   }
 
-  async get(key: string): Promise<any> {
+  async get(key: string): Promise<string | Record<string, any> | null> {
     try {
       const data = await this.client.get(key);
 
-      return data ? JSON.parse(data) : null;
+      return data ? this.parseJson(data) : null;
     } catch (error) {
       this.logger.error(error);
 
@@ -60,7 +60,7 @@ class Cache implements ICache {
 
   async set(key: string, value: string | Record<string, unknown>): Promise<void> {
     try {
-      const data = typeof value === 'object' ? JSON.stringify({ ...value }) : value;
+      const data = typeof value === 'string' ? value : JSON.stringify({ ...value });
       await this.client.set(key, data, { EX: defaultTTL });
     } catch (error) {
       this.logger.error(error);
@@ -74,6 +74,16 @@ class Cache implements ICache {
       }
     } catch (error) {
       this.logger.error(error);
+    }
+  }
+
+  private parseJson(str: string) {
+    try {
+      const json = JSON.parse(str);
+
+      return json;
+    } catch {
+      return str;
     }
   }
 }

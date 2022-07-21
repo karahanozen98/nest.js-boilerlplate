@@ -1,5 +1,6 @@
 /* eslint-disable @moneteam/nestjs/injectable-should-be-provided */
 import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { WEB_CLIENT_CONFIG } from 'common/constants';
@@ -7,10 +8,17 @@ import { AxiosNoResponseException, AxiosRequestFailedException } from 'exception
 
 @Injectable()
 export class WebClientService {
-  httpService: AxiosInstance;
+  private readonly httpService: AxiosInstance;
 
-  constructor(@Inject(WEB_CLIENT_CONFIG) config: AxiosRequestConfig<any> | undefined) {
+  private readonly req: Request & { correlationId: string };
+
+  constructor(
+    @Inject(WEB_CLIENT_CONFIG) config: AxiosRequestConfig<any> | undefined,
+    @Inject(REQUEST) req: Request & { correlationId: string },
+  ) {
+    this.req = req;
     this.httpService = axios.create(config);
+    this.httpService.defaults.headers.common['X-Correlation-ID'] = this.req.correlationId;
 
     this.httpService.interceptors.response.use(
       (value) => value,
