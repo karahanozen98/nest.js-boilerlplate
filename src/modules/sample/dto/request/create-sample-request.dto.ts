@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ApiArrayProperty,
-  ApiClassProperty,
+  ApiModelProperty,
   ApiNumberProperty,
   ApiStringProperty,
   IsPassword,
@@ -31,7 +31,7 @@ export class CreateSampleDto {
   @IsPassword()
   password: string;
 
-  @ApiClassProperty({ type: Planet })
+  @ApiModelProperty({ type: Planet })
   mainPlanet: Planet;
 
   @ApiArrayProperty({ type: Planet })

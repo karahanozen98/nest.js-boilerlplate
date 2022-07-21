@@ -72,7 +72,7 @@ export function ApiEnumPropertyOptional<TEnum>(
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function ApiClassProperty(options: { type: Function }) {
+export function ApiModelProperty(options: { type: Function }) {
   const { type } = options;
 
   return applyDecorators(
