@@ -5,20 +5,22 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { WEB_CLIENT_CONFIG } from 'common/constants';
 import { AxiosNoResponseException, AxiosRequestFailedException } from 'exceptions';
+import { Request } from 'interface';
 
 @Injectable()
 export class WebClientService {
   private readonly httpService: AxiosInstance;
 
-  private readonly req: Request & { correlationId: string };
+  private readonly req: Request;
 
   constructor(
     @Inject(WEB_CLIENT_CONFIG) config: AxiosRequestConfig<any> | undefined,
-    @Inject(REQUEST) req: Request & { correlationId: string },
+    @Inject(REQUEST) req: Request,
   ) {
     this.req = req;
     this.httpService = axios.create(config);
     this.httpService.defaults.headers.common['X-Correlation-ID'] = this.req.correlationId;
+    this.httpService.defaults.headers.common['Accept-Language'] = this.req.i18nLang;
 
     this.httpService.interceptors.response.use(
       (value) => value,
