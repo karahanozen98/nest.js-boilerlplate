@@ -1,7 +1,7 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import type { IRequestSession, ISessionUser } from 'interface';
+import { Request } from 'interface';
 
 import { SessionCacheService } from './session-cache.service';
 
