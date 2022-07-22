@@ -5,7 +5,7 @@ module.exports = {
     es6: true,
     node: true,
   },
-  ignorePatterns: ['.eslintrc.js', 'lint-staged.config.js'],
+  ignorePatterns: ['*.js', 'public/', 'views/', 'node_modules/'],
   parserOptions: {
     ecmaVersion: 2018,
     project: './tsconfig.eslint.json',

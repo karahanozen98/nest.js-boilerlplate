@@ -1,10 +1,11 @@
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { Module, Scope } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HttpExceptionFilter } from 'filters';
 import { AuthGuard } from 'guards/auth.guard';
+import { LoggerInterceptor } from 'interceptors/logger.interceptor';
 import { CorrelationMiddleware } from 'middlewares';
 import { ModuleContainerModule } from 'modules';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
@@ -67,6 +68,10 @@ import { AppController } from './app.controller';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerInterceptor,
     },
   ],
 })
