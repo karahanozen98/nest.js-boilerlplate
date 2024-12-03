@@ -4,7 +4,7 @@ import type { Type } from '@nestjs/common';
 import { applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { Order } from 'common/constants';
-import { PageMetaDto } from 'common/dto/page-meta.dto';
+import { PaginationDetails } from 'core/api';
 
 interface IApiResponseOptions {
   status: number;
@@ -12,7 +12,7 @@ interface IApiResponseOptions {
   schema: any;
 }
 
-export function ApiBaseOkResponse<T extends Type | string | [Function]>(options?: {
+export function ApiOkResponse<T extends Type | string | [Function]>(options?: {
   type?: T;
   status?: number;
   description?: string;
@@ -26,9 +26,9 @@ export function ApiBaseOkResponse<T extends Type | string | [Function]>(options?
         success: {
           type: 'boolean',
         },
-        error: {
-          type: 'object',
-          example: null,
+        message: {
+          type: 'string',
+          example: 'Ok',
         },
       },
     },
@@ -63,14 +63,14 @@ export function ApiBaseOkResponse<T extends Type | string | [Function]>(options?
   return applyDecorators(ApiResponse(resOptions));
 }
 
-export function ApiPageOkResponse<T extends Type>(options: {
+export function ApiPaginationResponse<T extends Type>(options: {
   type: T;
   status?: number;
   description?: string;
 }): MethodDecorator {
   return applyDecorators(
-    ApiQuery({ name: 'page', type: 'number', example: 10 }),
-    ApiQuery({ name: 'take', type: 'number', example: 1 }),
+    ApiQuery({ name: 'page', type: 'number', example: 1 }),
+    ApiQuery({ name: 'take', type: 'number', example: 10 }),
     ApiQuery({ name: 'order', enum: Order, enumName: 'Order', example: Order.ASC }),
     ApiExtraModels(options.type),
     ApiResponse({
@@ -85,12 +85,12 @@ export function ApiPageOkResponse<T extends Type>(options: {
           success: {
             type: 'boolean',
           },
-          error: {
-            type: 'object',
+          message: {
+            type: 'string',
             example: null,
           },
           pagination: {
-            $ref: getSchemaPath(PageMetaDto),
+            $ref: getSchemaPath(PaginationDetails),
           },
         },
       },

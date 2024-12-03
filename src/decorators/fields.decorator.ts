@@ -38,8 +38,6 @@ import {
 } from './transform.decorator';
 import { IsPassword, IsPhoneNumber } from './validator.decorator';
 
-type RequireField<T, K extends keyof T> = T & Required<Pick<T, K>>;
-
 interface IStringFieldOptions {
   minLength?: number;
   maxLength?: number;
@@ -58,7 +56,7 @@ interface INumberFieldOptions {
 }
 
 export function NumberField(
-  options: Omit<ApiPropertyOptions, 'type'> & INumberFieldOptions = {},
+  options: ApiPropertyOptions & INumberFieldOptions = {},
 ): PropertyDecorator {
   const decorators = [Type(() => Number)];
 
@@ -66,7 +64,7 @@ export function NumberField(
   const { each, int, minimum, maximum, isPositive, swagger } = options;
 
   if (swagger !== false) {
-    decorators.push(ApiProperty({ type: Number, ...options, example: int ? 1 : 1.2 }));
+    decorators.push(ApiProperty({ type: 'number', ...options, example: int ? 1 : 1.2 }));
   }
 
   if (each) {
@@ -102,11 +100,11 @@ export function NumberFieldOptional(
       isPositive: boolean;
     }> = {},
 ): PropertyDecorator {
-  return applyDecorators(IsOptional(), NumberField({ required: false, ...options }));
+  return applyDecorators(IsOptional(), NumberField({ ...options }));
 }
 
 export function StringField(
-  options: Omit<ApiPropertyOptions, 'type'> & IStringFieldOptions = {},
+  options: ApiPropertyOptions & IStringFieldOptions = {},
 ): PropertyDecorator {
   const decorators = [IsNotEmpty(), IsString(), Trim()];
 
@@ -140,7 +138,7 @@ export function StringFieldOptional(
 }
 
 export function PasswordField(
-  options: Omit<ApiPropertyOptions, 'type' | 'minLength'> & IStringFieldOptions = {},
+  options: ApiPropertyOptions & IStringFieldOptions = {},
 ): PropertyDecorator {
   return applyDecorators(
     StringField({ format: '^[\\d!#$%&*@A-Z^a-z]*$', ...options }),
@@ -155,7 +153,7 @@ export function PasswordFieldOptional(
 }
 
 export function BooleanField(
-  options: Omit<ApiPropertyOptions, 'type'> & Partial<{ swagger: boolean }> = {},
+  options: ApiPropertyOptions & Partial<{ swagger: boolean }> = {},
 ): PropertyDecorator {
   const decorators = [IsBoolean(), ToBoolean()];
 
@@ -173,8 +171,7 @@ export function BooleanFieldOptional(
 }
 
 export function TranslationsField(
-  options: RequireField<Omit<ApiPropertyOptions, 'isArray'>, 'type'> &
-    Partial<{ swagger: boolean }>,
+  options: ApiPropertyOptions & Partial<{ swagger: boolean }>,
 ): PropertyDecorator {
   const decorators = [
     ArrayMinSize(supportedLanguageCount),
@@ -193,15 +190,14 @@ export function TranslationsField(
 }
 
 export function TranslationsFieldOptional(
-  options: RequireField<Omit<ApiPropertyOptions, 'isArray'>, 'type'> &
-    Partial<{ swagger: boolean }>,
+  options: ApiPropertyOptions & Partial<{ swagger: boolean }>,
 ): PropertyDecorator {
-  return applyDecorators(IsOptional(), TranslationsField({ required: false, ...options }));
+  return applyDecorators(IsOptional(), TranslationsField({ ...options }));
 }
 
 export function EnumField<TEnum>(
   getEnum: () => TEnum,
-  options: Omit<ApiPropertyOptions, 'type' | 'enum' | 'enumName'> &
+  options: ApiPropertyOptions &
     Partial<{
       each: boolean;
       swagger: boolean;
@@ -231,7 +227,7 @@ export function EnumFieldOptional<TEnum>(
 }
 
 export function EmailField(
-  options: Omit<ApiPropertyOptions, 'type'> & IStringFieldOptions = {},
+  options: ApiPropertyOptions & IStringFieldOptions = {},
 ): PropertyDecorator {
   const decorators = [IsEmail(), StringField({ toLowerCase: true, ...options })];
 
@@ -243,13 +239,13 @@ export function EmailField(
 }
 
 export function EmailFieldOptional(
-  options: Omit<ApiPropertyOptions, 'type'> & IStringFieldOptions = {},
+  options: ApiPropertyOptions & IStringFieldOptions = {},
 ): PropertyDecorator {
-  return applyDecorators(IsOptional(), EmailField({ required: false, ...options }));
+  return applyDecorators(IsOptional(), EmailField({ ...options }));
 }
 
 export function PhoneField(
-  options: Omit<ApiPropertyOptions, 'type'> & Partial<{ swagger: boolean }> = {},
+  options: ApiPropertyOptions & Partial<{ swagger: boolean }> = {},
 ): PropertyDecorator {
   const decorators = [IsPhoneNumber(), PhoneNumberSerializer()];
 
@@ -266,17 +262,12 @@ export function PhoneFieldOptional(
   return applyDecorators(IsOptional(), PhoneField({ required: false, ...options }));
 }
 
-export function UUIDField(
-  options: Omit<ApiPropertyOptions, 'type' | 'format'> &
-    Partial<{ each: boolean; swagger: boolean }> = {},
-): PropertyDecorator {
-  const decorators = [IsUUID('4', { each: options?.each })];
+export function UUIDField(options: ApiPropertyOptions): PropertyDecorator {
+  const decorators = [IsUUID('4', { each: options?.isArray })];
 
-  if (options?.swagger !== false) {
-    decorators.push(ApiUUIDProperty(options));
-  }
+  decorators.push(ApiUUIDProperty(options));
 
-  if (options?.each) {
+  if (options?.isArray) {
     decorators.push(ArrayNotEmpty(), ToArray());
   }
 
@@ -291,26 +282,20 @@ export function UUIDFieldOptional(
 }
 
 export function URLField(
-  options: Omit<ApiPropertyOptions, 'type'> & IStringFieldOptions = {},
+  options: ApiPropertyOptions & IStringFieldOptions = {},
 ): PropertyDecorator {
   return applyDecorators(StringField(options), IsUrl());
 }
 
 export function URLFieldOptional(
-  options: Omit<ApiPropertyOptions, 'type'> & IStringFieldOptions = {},
+  options: ApiPropertyOptions & IStringFieldOptions = {},
 ): PropertyDecorator {
-  return applyDecorators(IsOptional(), URLField({ required: false, ...options }));
+  return applyDecorators(IsOptional(), URLField({ ...options }));
 }
 
-export function DateField(
-  options: Omit<ApiPropertyOptions, 'type'> & Partial<{ swagger: false }> = {},
-): PropertyDecorator {
+export function DateField(options: ApiPropertyOptions): PropertyDecorator {
   const decorators = [Type(() => Date), IsDate()];
-
-  if (options?.swagger !== false) {
-    decorators.push(ApiProperty(options));
-  }
-
+  decorators.push(ApiProperty(options));
   return applyDecorators(...decorators);
 }
 

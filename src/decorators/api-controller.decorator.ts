@@ -8,7 +8,7 @@ const globalHeaders = [
     name: 'Accept-Language',
     description: 'Select language',
     enum: LanguageCode,
-    example: LanguageCode.en_us,
+    example: LanguageCode.en,
   }),
 ];
 

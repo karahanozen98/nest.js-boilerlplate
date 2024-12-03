@@ -1,0 +1,8 @@
+{
+    "day": "Gün",
+    "name": "İsim",
+    "user": {
+        "found": "Tebrikler, kullanıcı bulundu",
+        "notFound": "Örnek kullanıcı bulunamadı"
+    }
+}

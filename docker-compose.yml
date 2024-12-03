@@ -32,7 +32,7 @@ services:
       BACKEND_URL: https://swapi.dev/api/
       ENABLE_DOCUMENTATION: false
       PORT: 3000
-      FALLBACK_LANG: en-us
+      FALLBACK_LANG: en
       PUBLIC_CACHE: redis://publicCache
       SESSION_CACHE: redis://sessionCache
     links:

@@ -1,7 +1,7 @@
 import type { ExecutionContext } from '@nestjs/common';
 import { createParamDecorator } from '@nestjs/common';
 import { Order } from 'common/constants';
-import { PageOptions } from 'common/dto/page-options.dto';
+import { PageOptions } from 'core/api';
 
 export const Pagination = createParamDecorator((_data: unknown, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest();
