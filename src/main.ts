@@ -4,7 +4,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { globalPrefixExcludeList } from 'common/constants';
 import compression from 'compression';
-import createRedisStore from 'connect-redis';
+import { RedisStore } from 'connect-redis';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { UnprocessableEntityExceptionFilter } from 'filters';
@@ -27,7 +27,6 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   const configService = app.select(SharedModule).get(ApiConfigService);
 
-  const RedisStore = createRedisStore(session);
   const redisClient = createClient({
     url: configService.apiConfig.sessionCacheUrl,
     legacyMode: true, // RedisStore currently not working with redis version 4.0 or above
@@ -47,9 +46,7 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
       cookie: { httpOnly: true, secure: configService.isProduction, maxAge: 1000 * 60 * 60 * 8 },
-      store: new RedisStore({
-        client: redisClient,
-      }),
+      store: new RedisStore({ client: redisClient }),
     }),
   );
 

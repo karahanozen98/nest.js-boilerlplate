@@ -1,5 +1,6 @@
 export enum LanguageCode {
-  en_us = 'en_us',
+  en = 'en',
+  tr = 'tr',
 }
 
 export const supportedLanguageCount = Object.values(LanguageCode).length;

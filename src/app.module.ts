@@ -48,8 +48,7 @@ import { AppController } from './app.controller';
       }),
     }),
     ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
+      throttlers: [{ limit: 5, ttl: 60 }],
     }),
     SharedModule,
     ModuleContainerModule,

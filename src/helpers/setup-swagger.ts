@@ -1,13 +1,13 @@
 import type { INestApplication } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PageMetaDto } from 'common/dto/page-meta.dto';
+import { PaginationDetails } from 'core/api';
 
 export function setupSwagger(app: INestApplication): void {
   const logger = new Logger('Swagger');
   const documentBuilder = new DocumentBuilder()
     .setTitle('API')
-    .setDescription('UPT Bff Documentation')
+    .setDescription('Nest.js Boilerplate Documentation')
     .addBearerAuth();
 
   if (process.env.API_VERSION) {
@@ -15,7 +15,7 @@ export function setupSwagger(app: INestApplication): void {
   }
 
   const document = SwaggerModule.createDocument(app, documentBuilder.build(), {
-    extraModels: [PageMetaDto],
+    extraModels: [PaginationDetails],
   });
 
   SwaggerModule.setup('documentation', app, document, {

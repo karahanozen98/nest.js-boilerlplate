@@ -1,8 +1,7 @@
 import { Global, Module } from '@nestjs/common';
-
 import { ApiConfigService } from './services/api-config.service';
 import { HttpContextService } from './services/http-context.service';
-import { LanguageService } from './services/language.service';
+import { LocalizationService } from './services/localization.service';
 import { PublicCacheService } from './services/public-cache.service';
 import { SessionCacheService } from './services/session-cache.service';
 
@@ -13,14 +12,14 @@ import { SessionCacheService } from './services/session-cache.service';
     SessionCacheService,
     PublicCacheService,
     HttpContextService,
-    LanguageService,
+    LocalizationService,
   ],
   exports: [
     ApiConfigService,
     SessionCacheService,
     PublicCacheService,
     HttpContextService,
-    LanguageService,
+    LocalizationService,
   ],
 })
 export class SharedModule {}

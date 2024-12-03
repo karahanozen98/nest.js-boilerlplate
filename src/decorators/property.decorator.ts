@@ -15,9 +15,7 @@ export function ApiNumberProperty(): PropertyDecorator {
   return applyDecorators(ApiProperty({ type: Number }), IsNumber());
 }
 
-export function ApiBooleanProperty(
-  options: Omit<ApiPropertyOptions, 'type'> = {},
-): PropertyDecorator {
+export function ApiBooleanProperty(options: ApiPropertyOptions): PropertyDecorator {
   return ApiProperty({ type: Boolean, ...options });
 }
 
@@ -27,13 +25,11 @@ export function ApiBooleanPropertyOptional(
   return ApiBooleanProperty({ required: false, ...options });
 }
 
-export function ApiUUIDProperty(
-  options: Omit<ApiPropertyOptions, 'type' | 'format'> & Partial<{ each: boolean }> = {},
-): PropertyDecorator {
+export function ApiUUIDProperty(options: ApiPropertyOptions): PropertyDecorator {
   return ApiProperty({
-    type: options?.each ? [String] : String,
+    type: 'string',
     format: 'uuid',
-    isArray: options?.each,
+    isArray: options.isArray,
     ...options,
   });
 }
@@ -47,13 +43,13 @@ export function ApiUUIDPropertyOptional(
 
 export function ApiEnumProperty<TEnum>(
   getEnum: () => TEnum,
-  options: Omit<ApiPropertyOptions, 'type'> & { each?: boolean } = {},
+  options: ApiPropertyOptions,
 ): PropertyDecorator {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const enumValue = getEnum() as any;
 
   return ApiProperty({
-    type: 'enum',
+    type: 'integer',
     // throw error during the compilation of swagger
     // isArray: options.each,
     enum: enumValue,
@@ -84,7 +80,7 @@ export function ApiModelProperty(options: { type: Function }) {
 
 export function ApiArrayProperty(options?: IApiArrayPropertyParams): PropertyDecorator {
   const type = options?.type;
-  const decorators = [ApiProperty({ type: [type || 'string'] }), IsArray()];
+  const decorators = [ApiProperty({ type: Function, isArray: true }), IsArray()];
 
   if (!type) {
     return applyDecorators(...decorators);
